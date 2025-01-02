@@ -4,6 +4,16 @@ import { useQuery } from "@tanstack/react-query";
 
 import { WeatherData, weatherSchema } from "../types/api";
 
+function getApproximateCoordinate({ lat, lon }: { lat: number; lon: number }): {
+  lat: string;
+  lon: string;
+} {
+  return {
+    lat: parseFloat(`${lat}`).toFixed(3),
+    lon: parseFloat(`${lon}`).toFixed(3),
+  };
+}
+
 async function fetchWeather(lat?: number, lon?: number): Promise<WeatherData> {
   if (!lat || !lon) {
     throw new Error("Location coordinates required");
@@ -15,7 +25,14 @@ async function fetchWeather(lat?: number, lon?: number): Promise<WeatherData> {
     );
   }
 
-  const response = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
+  const { lat: latApprox, lon: lonApprox } = getApproximateCoordinate({
+    lat,
+    lon,
+  });
+
+  const response = await fetch(
+    `/api/weather?lat=${latApprox}&lon=${lonApprox}`
+  );
   if (!response.ok) {
     const errorText = await response.text();
     console.error("Weather API Error:", {
