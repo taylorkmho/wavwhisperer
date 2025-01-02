@@ -1,4 +1,4 @@
-import { type Routine } from "@/app/workout/lib/schemas";
+import { type Routine } from "@/lib/schemas";
 
 import { supabase } from "./client";
 

@@ -2,22 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import {
-  Cloud,
-  CloudRainWind,
-  MapPin,
-  Rainbow,
-  ThermometerSun,
-} from "lucide-react";
-import { FaMoon, FaSun } from "react-icons/fa";
 
 import { generateWeatherResponse } from "@/lib/openai/functions";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Typewriter } from "@/components/typography";
 
 import { useWeather } from "../../hooks/useWeather";
-import WeatherCard from "./WeatherCard";
+import WeatherCard from "../WeatherCard";
 
 const LOCATIONS = {
   SF: { lat: 37.7749, lon: -122.4194, name: "San Francisco" },

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { OpenAI } from "openai";
 
-import { routineSchema, workoutFormSchema } from "@/app/workout/lib/schemas";
+import { routineSchema, workoutFormSchema } from "@/lib/schemas";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,

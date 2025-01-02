@@ -1,9 +1,9 @@
-import { Exercise, Routine } from "@/app/workout/lib/schemas";
+import { Exercise, Routine } from "@/lib/schemas";
 import {
   transformFinisher,
   transformMain,
   transformWarmup,
-} from "@/app/workout/lib/transforms";
+} from "@/lib/transforms";
 import { DbExercise, DbRoutine } from "@/app/workout/lib/types";
 
 export const transformDbExercise = (dbExercise: DbExercise): Exercise => ({
