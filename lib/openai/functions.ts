@@ -1,7 +1,4 @@
-import { type Routine } from "@/app/workout/lib/schemas";
-import { WeatherData } from "@/app/workout/types/api";
-
-import { openai } from "./client";
+import { WeatherData } from "@/types/api";
 
 export const openAIFunctions = [
   {

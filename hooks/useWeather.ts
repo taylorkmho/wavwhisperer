@@ -15,7 +15,7 @@ async function fetchWeather(lat?: number, lon?: number): Promise<WeatherData> {
     );
   }
 
-  const response = await fetch(`/api/workout/weather?lat=${lat}&lon=${lon}`);
+  const response = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
   if (!response.ok) {
     const errorText = await response.text();
     console.error("Weather API Error:", {
