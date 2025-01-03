@@ -1,4 +1,9 @@
-import { SurfReport, WaveHeight, GeneralDayInfo } from "@/types/noaa";
+import {
+  GeneralDayInfo,
+  surfReportSchema,
+  WaveHeight,
+  type SurfReport,
+} from "@/types/noaa";
 import { XMLParser } from "fast-xml-parser";
 
 interface ForecastItem {
@@ -40,13 +45,17 @@ export function parseNoaaReport(xmlText: string, island: string): SurfReport {
   // Parse discussion paragraphs
   const discussion = parseDiscussion(discussionItem.description);
 
-  return {
+  // Validate the parsed data
+  const report = {
     lastBuildDate: channel.lastBuildDate,
     lastBuildDateObject: new Date(channel.lastBuildDate),
     discussion,
     waveHeights,
     generalDayInfo,
   };
+
+  // This will throw if validation fails
+  return surfReportSchema.parse(report);
 }
 
 function parseWaveHeights(description: string): WaveHeight[] {
