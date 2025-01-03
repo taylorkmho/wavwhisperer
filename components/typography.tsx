@@ -52,7 +52,7 @@ export function Typewriter({
   }, [text, onComplete]);
 
   return (
-    <span className="font-pixel text-5xl font-medium leading-none">
+    <span className="font-pixel text-9xl font-medium leading-none">
       {displayedText}
       {(!hideCursorOnComplete || !hasCompletedRef.current) && (
         <motion.span

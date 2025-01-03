@@ -9,6 +9,7 @@ import { Typewriter } from "@/components/typography";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Glow } from "./components/Glow";
 import WeatherCheck from "@/components/WeatherCheck";
+import SurfReport from "@/components/SurfReport";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -28,18 +29,15 @@ export default function Home() {
           <AnimatePresence>
             {currentStage >= 0 && (
               <motion.p key="stage-0" layout>
-                <span className="font-pixel text-5xl font-medium leading-none">
-                  ALOHA NŌ, THIS IS TAYLOR HO
-                </span>
                 <Typewriter
                   hideCursorOnComplete
-                  text="’S GET SWOLE BOT 💪🏽"
+                  text="What’s your excuse?"
                   onComplete={() => setCurrentStage(1)}
                 />
               </motion.p>
             )}
             {currentStage >= 1 && (
-              <motion.p
+              <motion.div
                 layout
                 key="stage-1"
                 initial={{ opacity: 0, y: -10 }}
@@ -47,12 +45,8 @@ export default function Home() {
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
               >
-                <Typewriter
-                  hideCursorOnComplete
-                  text="Fitness + wellness = life. You wanting to work out?"
-                  onComplete={() => setCurrentStage(2)}
-                />
-              </motion.p>
+                <SurfReport />
+              </motion.div>
             )}
             {currentStage >= 2 && currentStage < 3 && (
               <motion.div

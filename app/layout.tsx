@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${fontSans.variable} ${fontSerif.variable} ${fontPixel.variable} ${fontSans.className} antialiased`}
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontPixel.variable} ${fontSans.className} antialiased dark`}
       >
         {children}
       </body>
