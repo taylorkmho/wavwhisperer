@@ -72,60 +72,44 @@ function parseWaveHeights(description: string): WaveHeight[] {
 
   dataRows.forEach((row, index) => {
     const cells = row.match(/<td[^>]*>(.*?)<\/td>/g);
-    if (!cells || cells.length < 5) return;
+    if (!cells || cells.length < 3) return; // We only need first 3 cells now
 
-    const direction = cells[0].replace(/<[^>]*>/g, "").trim();
-    const pmHeight = cells[1].replace(/<[^>]*>/g, "").trim();
-    const amHeight = cells[2].replace(/<[^>]*>/g, "").trim();
-    const nextAmHeight = cells[3].replace(/<[^>]*>/g, "").trim();
-    const nextPmHeight = cells[4].replace(/<[^>]*>/g, "").trim();
+    const direction = cells[0]
+      .replace(/<[^>]*>/g, "")
+      .trim()
+      .charAt(0);
+    const currentHeight = cells[1].replace(/<[^>]*>/g, "").trim(); // Tonight PM
+    const nextHeight = cells[2].replace(/<[^>]*>/g, "").trim(); // Tonight AM
 
-    // Add PM height
-    addWaveHeight(waveHeights, direction, "PM", "Tonight", pmHeight, index);
-    // Add AM height
-    addWaveHeight(waveHeights, direction, "AM", "Tonight", amHeight, index);
-    // Add next day AM height
-    addWaveHeight(
-      waveHeights,
+    // Only process Tonight PM with its trend
+    const [currentMin, currentMax] = currentHeight
+      .split("-")
+      .map((n) => parseFloat(n));
+    const [nextMin, nextMax] = nextHeight.split("-").map((n) => parseFloat(n));
+
+    const currentAvg = (currentMin + currentMax) / 2;
+    const nextAvg = (nextMin + nextMax) / 2;
+
+    // Determine trend
+    let trend: "increasing" | "decreasing" | "steady" = "steady";
+    const difference = nextAvg - currentAvg;
+    const threshold = 0.5;
+
+    if (Math.abs(difference) > threshold) {
+      trend = difference > 0 ? "increasing" : "decreasing";
+    }
+
+    waveHeights.push({
       direction,
-      "AM",
-      "Tomorrow",
-      nextAmHeight,
-      index
-    );
-    // Add next day PM height
-    addWaveHeight(
-      waveHeights,
-      direction,
-      "PM",
-      "Tomorrow",
-      nextPmHeight,
-      index
-    );
+      height: currentHeight,
+      minHeight: currentMin,
+      maxHeight: currentMax,
+      trend,
+      order: index,
+    });
   });
 
   return waveHeights.sort((a, b) => a.order - b.order);
-}
-
-function addWaveHeight(
-  waveHeights: WaveHeight[],
-  direction: string,
-  time: string,
-  day: string,
-  height: string,
-  order: number
-) {
-  const [min, max] = height.split("-").map((n) => parseFloat(n));
-  waveHeights.push({
-    direction,
-    day,
-    time,
-    height,
-    minHeight: min,
-    maxHeight: max,
-    averageHeight: (min + max) / 2,
-    order,
-  });
 }
 
 function parseGeneralDayInfo(description: string): GeneralDayInfo[] {

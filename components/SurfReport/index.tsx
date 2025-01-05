@@ -1,8 +1,20 @@
 import { decode } from "html-entities";
+import Image from "next/image";
 import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
-
+import Link from "next/link";
+import {
+  FaArrowRightLong,
+  FaArrowTrendDown,
+  FaArrowTrendUp,
+} from "react-icons/fa6";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "../ui/tooltip";
 export default function SurfReport({ island = "oahu" }: { island?: string }) {
   const { data: report, isLoading, error } = useNoaaSurfReport(island);
 
@@ -20,20 +32,47 @@ export default function SurfReport({ island = "oahu" }: { island?: string }) {
 
   return (
     <div className="space-y-6">
-      {/* Last Updated */}
-      <div className="text-sm text-muted-foreground">
-        Last updated: {new Date(report.lastBuildDate).toLocaleString()}
-      </div>
+      <p className="text-sm">
+        <span className="text-muted-foreground">Last updated:</span>{" "}
+        <strong>
+          {new Date(report.lastBuildDate).toLocaleString("en-US", {
+            month: "long",
+            day: "numeric",
+            hour: "numeric",
+            minute: "2-digit",
+            year: "numeric",
+            hour12: true,
+          })}
+        </strong>
+      </p>
 
-      {/* Discussion */}
       {report.discussion && report.discussion.length > 0 && (
         <Card>
-          <CardContent className="pt-6">
-            <h3 className="mb-4 text-lg font-semibold">Discussion</h3>
-            <div className="space-y-4 text-sm">
+          <CardContent className="pt-6 space-y-4">
+            <div className="space-y-2 text-base font-mono">
               {report.discussion.map((paragraph, index) => (
                 <p key={index}>{decode(paragraph)}</p>
               ))}
+            </div>
+            <div className="flex items-center gap-1.5 text-xs">
+              <Image
+                src="/noaa_digital_logo.svg"
+                alt="NOAA"
+                width={28}
+                height={28}
+              />
+              <h6 className="flex flex-col leading-none gap-0.5">
+                <span className="text-muted-foreground">
+                  Report data pulled from
+                </span>{" "}
+                <Link
+                  href="https://www.weather.gov/hfo/SRF"
+                  className="font-bold hover:underline underline-offset-2 decoration-foreground/50"
+                  target="_blank"
+                >
+                  National Oceanic and Atmospheric Administration
+                </Link>
+              </h6>
             </div>
           </CardContent>
         </Card>
@@ -47,17 +86,38 @@ export default function SurfReport({ island = "oahu" }: { island?: string }) {
             {report.waveHeights.map((wave, index) => (
               <div
                 key={index}
-                className="rounded-lg border bg-card p-4 text-card-foreground"
+                className="text-center rounded-lg border bg-card p-4 text-card-foreground"
               >
-                <div className="flex justify-between">
-                  <span className="font-medium">{wave.direction}</span>
-                  <span className="text-sm text-muted-foreground">
-                    {wave.day} {wave.time}
-                  </span>
-                </div>
-                <div className="mt-2 text-2xl font-bold">{wave.height} ft</div>
-                <div className="mt-1 text-sm text-muted-foreground">
-                  Average: {wave.averageHeight.toFixed(1)} ft
+                <h6 className="font-semibold text-sm">{wave.direction}</h6>
+                <div className="flex justify-center gap-2 mt-2 text-2xl font-bold">
+                  <span>{wave.height} ft</span>
+                  <TooltipProvider delayDuration={250}>
+                    <Tooltip>
+                      {wave.trend &&
+                        (wave.trend === "increasing" ? (
+                          <>
+                            <TooltipTrigger className="opacity-50 hover:opacity-100 transition-opacity delay-250 duration-250">
+                              <FaArrowTrendUp className="size-5 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>Increasing</TooltipContent>
+                          </>
+                        ) : wave.trend === "decreasing" ? (
+                          <>
+                            <TooltipTrigger className="opacity-50 hover:opacity-100 transition-opacity delay-250 duration-250">
+                              <FaArrowTrendDown className="size-5 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>Decreasing</TooltipContent>
+                          </>
+                        ) : (
+                          <>
+                            <TooltipTrigger className="opacity-50 hover:opacity-100 transition-opacity delay-250 duration-250">
+                              <FaArrowRightLong className="size-4 text-muted-foreground" />
+                            </TooltipTrigger>
+                            <TooltipContent>Steady</TooltipContent>
+                          </>
+                        ))}
+                    </Tooltip>
+                  </TooltipProvider>
                 </div>
               </div>
             ))}

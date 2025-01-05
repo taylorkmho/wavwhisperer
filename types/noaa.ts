@@ -3,12 +3,10 @@ import { z } from "zod";
 // Wave Height Schema
 export const waveHeightSchema = z.object({
   direction: z.string(),
-  day: z.string(),
-  time: z.string(),
   height: z.string(),
   minHeight: z.number(),
   maxHeight: z.number(),
-  averageHeight: z.number(),
+  trend: z.enum(["increasing", "decreasing", "steady"]),
   order: z.number(),
 });
 
