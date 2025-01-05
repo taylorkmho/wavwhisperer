@@ -9,8 +9,8 @@ import {
   FaArrowTrendUp,
 } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
-export default function SurfReport({ island = "oahu" }: { island?: string }) {
-  const { data: report, isLoading, error } = useNoaaSurfReport(island);
+export default function SurfReport() {
+  const { data: report, isLoading, error } = useNoaaSurfReport();
 
   if (isLoading) {
     return <div>Loading surf report...</div>;
@@ -84,6 +84,8 @@ export default function SurfReport({ island = "oahu" }: { island?: string }) {
             <div className="space-y-2 text-sm text-secondary-foreground font-normal font-mono">
               {report.discussion.map((paragraph, index) => (
                 <p key={index}>{decode(paragraph)}</p>
+              ))}
+            </div>
             <div className="flex items-center gap-1.5 text-xs">
               <Image
                 src="/noaa_digital_logo.svg"

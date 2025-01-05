@@ -5,7 +5,6 @@ const NOAA_URL = "https://www.weather.gov/source/hfo/xml/SurfState.xml";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const island = searchParams.get("island") || "oahu";
   const format = searchParams.get("format");
 
   try {
@@ -18,7 +17,7 @@ export async function GET(request: Request) {
     }
 
     // Otherwise return parsed data
-    const report = parseNoaaReport(xmlText, island);
+    const report = parseNoaaReport(xmlText);
     return NextResponse.json(report);
   } catch (error) {
     console.error("Failed to fetch NOAA data:", error);
