@@ -1,4 +1,4 @@
-import { SurfReportService } from "@/lib/services/surf-report";
+import { SurfReportServerService } from "@/lib/services/surf-report.server";
 import { NextResponse } from "next/server";
 
 const NOAA_URL = "https://www.weather.gov/source/hfo/xml/SurfState.xml";
@@ -27,9 +27,9 @@ export async function GET(request: Request) {
     const xmlText = await response.text();
     console.log("Received XML length:", xmlText.length);
 
-    // Save to Supabase
+    // Save to Supabase using server service
     console.log("Saving to Supabase...");
-    const savedReport = await SurfReportService.saveReport(xmlText);
+    const savedReport = await SurfReportServerService.saveReport(xmlText);
 
     return NextResponse.json({ success: true, report: savedReport });
   } catch (error) {
