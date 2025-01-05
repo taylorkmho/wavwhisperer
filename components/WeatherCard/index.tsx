@@ -15,7 +15,7 @@ interface WeatherCardProps {
 
 export default function WeatherCard({ location, weather }: WeatherCardProps) {
   return (
-    <Card className="p-4" variant="filled">
+    <Card className="p-4">
       <div className="flex flex-col gap-2">
         {/* Location and Temperature */}
         <div className="flex items-center justify-between">
