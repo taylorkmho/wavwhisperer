@@ -25,7 +25,7 @@ export default function Home() {
         <section className="mx-auto max-w-8xl space-y-4">
           <AnimatePresence>
             {currentStage >= 0 && (
-              <motion.p key="stage-0" layout>
+              <motion.p key="stage-0" layout className="text-center">
                 <Typewriter
                   hideCursorOnComplete
                   text="How art thou, surf?"
@@ -41,6 +41,7 @@ export default function Home() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
+                className="max-w-3xl mx-auto"
               >
                 <SurfReport />
               </motion.div>

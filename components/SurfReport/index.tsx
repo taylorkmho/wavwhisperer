@@ -26,26 +26,23 @@ export default function SurfReport({ island = "oahu" }: { island?: string }) {
 
   return (
     <div className="space-y-6">
+      {report.lastBuildDate && (
+        <p className="text-2xl font-bold">
+          {new Date(report.lastBuildDate).toLocaleString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })}
+        </p>
+      )}
       {report.discussion && report.discussion.length > 0 && (
         <Card>
           <CardContent className="pt-6 space-y-4">
-            <p className="text-2xl font-bold">
-              {new Date(report.lastBuildDate).toLocaleString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </p>
-            <div className="space-y-2 text-sm text-secondary-foreground font-normal font-mono">
-              {report.discussion.map((paragraph, index) => (
-                <p key={index}>{decode(paragraph)}</p>
-              ))}
-            </div>
             <div className="flex flex-wrap gap-4">
               {report.waveHeights.map((wave, index) => (
                 <div
                   key={index}
-                  className="flex flex-col items-center gap-1 text-center text-card-foreground w-16"
+                  className="flex items-center gap-2 text-center text-card-foreground"
                 >
                   <h6 className="font-semibold text-muted-foreground text-xs">
                     {wave.direction}
@@ -84,6 +81,9 @@ export default function SurfReport({ island = "oahu" }: { island?: string }) {
                 </div>
               ))}
             </div>
+            <div className="space-y-2 text-sm text-secondary-foreground font-normal font-mono">
+              {report.discussion.map((paragraph, index) => (
+                <p key={index}>{decode(paragraph)}</p>
             <div className="flex items-center gap-1.5 text-xs">
               <Image
                 src="/noaa_digital_logo.svg"
