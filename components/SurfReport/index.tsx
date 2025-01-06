@@ -1,7 +1,6 @@
 import { decode } from "html-entities";
 import Image from "next/image";
 import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
-import { Card, CardContent } from "@/components/ui/card";
 import Link from "next/link";
 import {
   FaArrowRightLong,
@@ -25,97 +24,95 @@ export default function SurfReport() {
   }
 
   return (
-    <div className="space-y-6">
-      {report.lastBuildDate && (
-        <p className="text-2xl font-bold">
-          {new Date(report.lastBuildDate).toLocaleString("en-US", {
-            month: "long",
-            day: "numeric",
-            year: "numeric",
-          })}
-        </p>
-      )}
+    <div className="space-y-4">
       {report.discussion && report.discussion.length > 0 && (
-        <Card>
-          <CardContent className="pt-6 space-y-4">
-            {report.poem?.map((line, index) => (
+        <>
+          {report.lastBuildDate && (
+            <p className="text-2xl font-bold">
+              {new Date(report.lastBuildDate).toLocaleString("en-US", {
+                month: "long",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </p>
+          )}
+          {report.poem?.map((line, index) => (
+            <div
+              key={index}
+              className="font-serif text-3xl text-muted-foreground italic"
+            >
+              {line}
+            </div>
+          ))}
+
+          <div className="flex flex-wrap gap-4">
+            {report.waveHeights.map((wave, index) => (
               <div
                 key={index}
-                className="font-serif text-sm text-muted-foreground italic text-center border-l-2 border-muted px-4 py-2"
+                className="flex items-center gap-2 text-center text-card-foreground"
               >
-                {line}
+                <h6 className="font-semibold text-muted-foreground text-xs">
+                  {wave.direction}
+                </h6>
+
+                <span className="text-base text-secondary-foreground font-bold">
+                  {wave.height} ft
+                </span>
+                <span
+                  className={cn(
+                    "flex items-center gap-1.5 text-xs rounded-full px-2 h-5",
+                    wave.trend === "increasing" &&
+                      "text-green-500 bg-green-500/10",
+                    wave.trend === "decreasing" && "text-red-500 bg-red-500/10",
+                    wave.trend === "steady" &&
+                      "text-muted-foreground bg-muted-foreground/10"
+                  )}
+                  title={
+                    wave.trend === "increasing"
+                      ? "Increasing"
+                      : wave.trend === "decreasing"
+                      ? "Decreasing"
+                      : "Steady"
+                  }
+                >
+                  {wave.trend &&
+                    (wave.trend === "increasing" ? (
+                      <FaArrowTrendUp className="size-3" />
+                    ) : wave.trend === "decreasing" ? (
+                      <FaArrowTrendDown className="size-3" />
+                    ) : (
+                      <FaArrowRightLong className="size-3" />
+                    ))}
+                </span>
               </div>
             ))}
-            <div className="flex flex-wrap gap-4">
-              {report.waveHeights.map((wave, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-2 text-center text-card-foreground"
-                >
-                  <h6 className="font-semibold text-muted-foreground text-xs">
-                    {wave.direction}
-                  </h6>
-
-                  <span className="text-base text-secondary-foreground font-bold">
-                    {wave.height} ft
-                  </span>
-                  <span
-                    className={cn(
-                      "flex items-center gap-1.5 text-xs rounded-full px-2 h-5",
-                      wave.trend === "increasing" &&
-                        "text-green-500 bg-green-500/10",
-                      wave.trend === "decreasing" &&
-                        "text-red-500 bg-red-500/10",
-                      wave.trend === "steady" &&
-                        "text-muted-foreground bg-muted-foreground/10"
-                    )}
-                    title={
-                      wave.trend === "increasing"
-                        ? "Increasing"
-                        : wave.trend === "decreasing"
-                        ? "Decreasing"
-                        : "Steady"
-                    }
-                  >
-                    {wave.trend &&
-                      (wave.trend === "increasing" ? (
-                        <FaArrowTrendUp className="size-3" />
-                      ) : wave.trend === "decreasing" ? (
-                        <FaArrowTrendDown className="size-3" />
-                      ) : (
-                        <FaArrowRightLong className="size-3" />
-                      ))}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <div className="space-y-2 text-sm text-secondary-foreground font-normal font-mono">
-              {report.discussion.map((paragraph, index) => (
-                <p key={index}>{decode(paragraph)}</p>
-              ))}
-            </div>
-            <div className="flex items-center gap-1.5 text-xs">
-              <Image
-                src="/noaa_digital_logo.svg"
-                alt="NOAA"
-                width={28}
-                height={28}
-              />
-              <h6 className="flex flex-col leading-none gap-0.5">
-                <span className="text-muted-foreground">
-                  Report data pulled from
-                </span>{" "}
-                <Link
-                  href="https://www.weather.gov/hfo/SRF"
-                  className="font-bold hover:underline underline-offset-2 decoration-foreground/50"
-                  target="_blank"
-                >
-                  National Oceanic and Atmospheric Administration
-                </Link>
-              </h6>
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+          <div className="space-y-2 text-sm text-secondary-foreground font-normal font-mono">
+            {report.discussion.map((paragraph, index) => (
+              <p key={index}>{decode(paragraph)}</p>
+            ))}
+          </div>
+          <div className="flex items-center gap-1.5 text-xs">
+            <Image
+              src="/noaa_digital_logo.svg"
+              alt="NOAA"
+              width={28}
+              height={28}
+            />
+            <h6 className="flex flex-col leading-none gap-0.5">
+              <span className="text-muted-foreground">
+                Report data pulled from
+              </span>{" "}
+              <Link
+                href="https://www.weather.gov/hfo/SRF"
+                className="font-bold hover:underline underline-offset-2 decoration-foreground/50"
+                target="_blank"
+              >
+                National Oceanic and Atmospheric Administration
+              </Link>
+            </h6>
+          </div>
+        </>
       )}
     </div>
   );

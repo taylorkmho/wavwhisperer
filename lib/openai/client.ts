@@ -40,10 +40,13 @@ export async function generateSurfLimerick(
           content: `
 Create a Surf Forecast Limerick with exactly 5 lines
 
+GUIDELINES
+- This report is for Hawaii.
+- Someone should be able to read it and decide where and when to surf.
+
 LIMERICK STRUCTURE
 1. Opening (Lines 1-2):
   - Establish dominant swell(s) direction (e.g. north, west)
-  - Creative use of pidgin language for size/intensity
   - Both lines rhyme (sound A)
 
 2. Middle (Line 3-4):
@@ -56,15 +59,13 @@ LIMERICK STRUCTURE
   - Return to longer meter
 
 STRICT REQUIREMENTS
-- Exactly 5 lines
-- No extra spaces before or after lines
+- Exactly 5 lines, with each on a new line
 - Rhyme scheme: AABBA
+- No text formatting for titles or lines
 - Every line must contain forecast information (e.g. direction, size, time, shore)
-- Cover all aspects of the forecast
- * If there is any mention for a specific direction, include it
- * If there is any mention for a specific day or time, include it
- * If there is any mention for a specific swell size, include it
 - Every swell direction (e.g. north, south, east, west) should be mentioned if it is forecasted
+- Include timing details (e.g., "Saturday")
+- It should be grammatically correct, prioritizing grammatical correctness over creativity
 
 The final limerick should convey key forecast information within this strict format.`,
         },
