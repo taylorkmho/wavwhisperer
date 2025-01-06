@@ -8,6 +8,8 @@ export const surfReportRecordSchema = z.object({
   discussion: z.array(z.string()),
   wave_heights: z.array(waveHeightSchema),
   raw_xml: z.string(),
+  poem: z.array(z.string()),
+  model: z.string(),
 });
 
 export type SurfReportRecord = z.infer<typeof surfReportRecordSchema>;

@@ -38,6 +38,14 @@ export default function SurfReport() {
       {report.discussion && report.discussion.length > 0 && (
         <Card>
           <CardContent className="pt-6 space-y-4">
+            {report.poem?.map((line, index) => (
+              <div
+                key={index}
+                className="font-serif text-sm text-muted-foreground italic text-center border-l-2 border-muted px-4 py-2"
+              >
+                {line}
+              </div>
+            ))}
             <div className="flex flex-wrap gap-4">
               {report.waveHeights.map((wave, index) => (
                 <div
