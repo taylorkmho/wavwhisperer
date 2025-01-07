@@ -31,13 +31,6 @@ export default function Home() {
               </Link>
             </Button>
           </div>
-          <div className="z-10 pt-2 text-center absolute top-0 inset-x-0 px-8 flex flex-col items-center justify-center">
-            <Typewriter
-              hideCursorOnComplete
-              text="How art thou, surf?"
-              className="text-4xl md:text-7xl"
-            />
-          </div>
           <SurfReport />
         </section>
       </main>

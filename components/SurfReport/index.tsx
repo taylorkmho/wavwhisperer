@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
 import { CrystallBall } from "../CrystallBall";
+import { Typewriter } from "../typography";
 export default function SurfReport() {
   const { data: report, isLoading, error } = useNoaaSurfReport();
 
@@ -33,17 +34,27 @@ export default function SurfReport() {
       {report.discussion && report.discussion.length > 0 && (
         <>
           <div className="relative h-[100vh]">
-            <CrystallBall poem={report.poem} />
-            <div className="absolute bottom-4 inset-x-0 flex flex-col gap-2">
+            <div className="z-10 pt-2 text-center absolute top-0 inset-x-0 px-8 flex flex-col items-center justify-center">
               {report.lastBuildDate && (
-                <p className="text-sm md:text-xl font-bold text-center">
-                  {new Date(report.lastBuildDate).toLocaleString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
+                <p className="text-xs md:text-sm text-center px-2 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 border border-fuchsia-500/20 rounded-md">
+                  Hawai‘i surf report{" "}
+                  <strong>
+                    {new Date(report.lastBuildDate).toLocaleString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                  </strong>
                 </p>
               )}
+              <Typewriter
+                hideCursorOnComplete
+                text="How art thou, surf?"
+                className="text-4xl md:text-7xl"
+              />
+            </div>
+            <CrystallBall poem={report.poem} />
+            <div className="absolute bottom-4 inset-x-0 flex flex-col gap-2">
               <div className="flex flex-wrap gap-4 justify-center px-4 pb-2">
                 {report.waveHeights.map((wave, index) => (
                   <div
