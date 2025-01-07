@@ -45,7 +45,9 @@ const DiscoBall: React.FC<{ poem?: string[] }> = ({ poem }) => {
 
   useFrame(() => {
     if (mesh.current) {
-      mesh.current.rotation.y += 0.01;
+      mesh.current.rotation.x += 0.0001;
+      mesh.current.rotation.y += 0.001;
+      mesh.current.rotation.z -= 0.001;
       // stop rotation if thickness is less than 0.026 and interpolate to the nearest multiple of 360
       if (thickness < 0.026) {
         mesh.current.rotation.y = THREE.MathUtils.lerp(
@@ -53,6 +55,24 @@ const DiscoBall: React.FC<{ poem?: string[] }> = ({ poem }) => {
           THREE.MathUtils.degToRad(
             Math.round(
               THREE.MathUtils.radToDeg(mesh.current.rotation.y) / 360
+            ) * 360
+          ),
+          0.1
+        );
+        mesh.current.rotation.x = THREE.MathUtils.lerp(
+          mesh.current.rotation.x,
+          THREE.MathUtils.degToRad(
+            Math.round(
+              THREE.MathUtils.radToDeg(mesh.current.rotation.x) / 360
+            ) * 360
+          ),
+          0.1
+        );
+        mesh.current.rotation.z = THREE.MathUtils.lerp(
+          mesh.current.rotation.z,
+          THREE.MathUtils.degToRad(
+            Math.round(
+              THREE.MathUtils.radToDeg(mesh.current.rotation.z) / 360
             ) * 360
           ),
           0.1
