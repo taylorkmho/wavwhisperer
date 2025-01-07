@@ -7,6 +7,7 @@ import { Typewriter } from "@/components/typography";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import WeatherCheck from "@/components/WeatherCheck";
 import SurfReport from "@/components/SurfReport";
+import { CrystallBall } from "@/components/CrystallBall";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -26,6 +27,7 @@ export default function Home() {
           <AnimatePresence>
             {currentStage >= 0 && (
               <motion.p key="stage-0" layout className="text-center">
+                <CrystallBall />
                 <Typewriter
                   hideCursorOnComplete
                   text="How art thou, surf?"
