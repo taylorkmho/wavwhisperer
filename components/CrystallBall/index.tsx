@@ -1,135 +1,150 @@
-import { Suspense, useEffect, useRef, useState } from "react";
-import { Environment } from "@react-three/drei";
+import { Suspense, useEffect, useRef, useMemo, useState } from "react";
 import {
-  Canvas,
-  Vector3,
-  useFrame,
-  useLoader,
-  useThree,
-} from "@react-three/fiber";
-import {
-  BallCollider,
-  Physics,
-  RapierRigidBody,
-  RigidBody,
-  useRopeJoint,
-} from "@react-three/rapier";
+  Environment,
+  MeshTransmissionMaterial,
+  Stars,
+  Text,
+} from "@react-three/drei";
+import { useControls } from "leva";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
-interface DiscoBallProps {
-  anchorPosition: Vector3;
-  ballPosition: Vector3;
-  ropeLength: number;
-}
+const INITIAL_THICKNESS = 40;
 
-const DiscoBall: React.FC<DiscoBallProps> = ({
-  anchorPosition,
-  ballPosition,
-  ropeLength,
-}) => {
-  // const { camera } = useThree();
-  const anchor = useRef<RapierRigidBody>(null);
-  const meshRef = useRef<RapierRigidBody>(null);
-  const { scene } = useLoader(GLTFLoader, "/models/discoball.gltf");
-  useRopeJoint(
-    anchor as React.RefObject<RapierRigidBody>,
-    meshRef as React.RefObject<RapierRigidBody>,
-    [[0, 0, 0], [0, ropeLength, 0], ropeLength]
+const DiscoBall: React.FC<{ poem?: string[] }> = ({ poem }) => {
+  const { size } = useThree();
+  const mesh = useRef<THREE.Mesh>(null);
+  const [thickness, setThickness] = useState(INITIAL_THICKNESS);
+  const targetThickness = useRef(INITIAL_THICKNESS);
+  const isPointerDown = useRef(false);
+  const holdStartTime = useRef<number | null>(null);
+  const clockRef = useRef<THREE.Clock | undefined>(undefined);
+
+  // Use fixed size instead of viewport for scale calculation
+  const scale = useMemo(
+    () => Math.min(size.width, size.height) / 500,
+    [size.width, size.height]
   );
 
-  useEffect(() => {
-    const glassMaterial = new THREE.MeshPhysicalMaterial({
-      transparent: true,
-      transmission: 1.8,
-      thickness: 1,
-      roughness: 0,
-      ior: 1.8,
-    });
-    scene.traverse((child) => {
-      if (child instanceof THREE.Mesh) {
-        child.material = glassMaterial;
-      }
-    });
-  }, [scene]);
+  useFrame(({ clock }) => {
+    clockRef.current = clock;
+    if (isPointerDown.current && holdStartTime.current !== null) {
+      const holdDuration = clock.getElapsedTime() - holdStartTime.current;
+      const progress = Math.min(holdDuration / 1, 1); // 1 seconds to complete
+      targetThickness.current = THREE.MathUtils.lerp(
+        INITIAL_THICKNESS,
+        0.025,
+        progress
+      );
+    }
+
+    setThickness((current) =>
+      THREE.MathUtils.lerp(current, targetThickness.current, 0.1)
+    );
+  });
 
   useFrame(() => {
-    if (meshRef.current) {
-      const velocity = meshRef.current.linvel();
-      meshRef.current.setAngvel({ x: 0, y: 0.5, z: 0 }, true);
-      meshRef.current.setLinvel(
-        { x: velocity.x * 0.99, y: velocity.y * 0.99, z: velocity.z * 0.99 },
-        true
-      );
+    if (mesh.current) {
+      mesh.current.rotation.y += 0.01;
+      // stop rotation if thickness is less than 0.026 and interpolate to the nearest multiple of 360
+      if (thickness < 0.026) {
+        mesh.current.rotation.y = THREE.MathUtils.lerp(
+          mesh.current.rotation.y,
+          THREE.MathUtils.degToRad(
+            Math.round(
+              THREE.MathUtils.radToDeg(mesh.current.rotation.y) / 360
+            ) * 360
+          ),
+          0.1
+        );
+      }
     }
   });
 
+  useEffect(() => {
+    const handlePointerUp = () => {
+      isPointerDown.current = false;
+      holdStartTime.current = null;
+      if (targetThickness.current > 0.026) {
+        // If not fully compressed
+        targetThickness.current = INITIAL_THICKNESS;
+      }
+    };
+
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => window.removeEventListener("pointerup", handlePointerUp);
+  }, []);
+
+  useEffect(() => {
+    if (mesh.current) {
+      mesh.current.position.set(0, 0, 0);
+    }
+  }, [mesh]);
+
   return (
-    <group>
-      <RigidBody ref={anchor} position={anchorPosition} type="fixed" />
-      <RigidBody
-        ref={meshRef}
-        colliders="ball"
-        position={ballPosition}
-        restitution={1.2}
-        density={100}
+    <mesh
+      ref={mesh}
+      scale={scale}
+      onPointerDown={() => {
+        isPointerDown.current = true;
+        holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
+      }}
+    >
+      <sphereGeometry args={[1, 100, 100]} />
+      <MeshTransmissionMaterial
+        transmission={1}
+        thickness={thickness}
+        roughness={0.1}
+        metalness={0}
+        chromaticAberration={0.2}
+        ior={1.45}
+        backside={false}
+      />
+      <Text
+        position={[0, 0, 0]}
+        font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
+        fontSize={0.08}
+        textAlign="center"
       >
-        <primitive object={scene} />
-        <BallCollider args={[1.05]} />
-      </RigidBody>
-    </group>
+        {poem?.join("\n")}
+      </Text>
+    </mesh>
   );
 };
 
-const Scene: React.FC = () => {
+const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
   const { camera } = useThree();
-  const [isMobile, setIsMobile] = useState(() => {
-    return window.innerWidth < 768;
-  });
 
+  // Add useEffect to set camera position only once on mount
   useEffect(() => {
-    if (isMobile) {
-      camera.position.set(3, 2, 7);
-    } else {
-      camera.position.set(0, 0, 5);
-    }
-    camera.lookAt(new THREE.Vector3(0, 0, 0));
-  }, [camera, isMobile]);
-
-  useEffect(() => {
-    const checkViewport = () => {
-      const isMobileView = window.innerWidth < 768;
-      setIsMobile(isMobileView);
-    };
-
-    checkViewport();
-
-    window.addEventListener("resize", checkViewport);
-
-    return () => window.removeEventListener("resize", checkViewport);
-  }, []);
+    camera.position.set(0, 0, 4);
+  }, [camera]);
 
   return (
     <Suspense fallback={null}>
-      <DiscoBall
-        ropeLength={isMobile ? 5 : 10}
-        anchorPosition={isMobile ? [0, 13, 0] : [0, 20, 0]}
-        ballPosition={isMobile ? [0, 2, 0] : [0, 0, 0]}
+      <Stars
+        radius={10}
+        depth={500}
+        count={1000}
+        factor={20}
+        saturation={0}
+        fade
+        speed={0.5}
       />
+      <DiscoBall poem={poem} />
     </Suspense>
   );
 };
 
-export const CrystallBall: React.FC = () => {
+export const CrystallBall: React.FC<{
+  className?: string;
+  poem?: string[];
+}> = ({ className, poem }) => {
   return (
-    <Canvas className="size-full">
-      <Environment
-        // preset={discoOptions.world === DiscoWorld.Night ? "night" : "warehouse"}
-        preset="warehouse"
-      />
-      <Physics gravity={[0, -40, 0]}>
-        <Scene />
-      </Physics>
+    <Canvas className={className}>
+      <directionalLight position={[10, 10, 10]} intensity={5} />
+      <Environment preset="night" />
+      <Scene poem={poem} />
     </Canvas>
   );
 };

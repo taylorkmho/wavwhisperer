@@ -8,6 +8,7 @@ import {
   FaArrowTrendUp,
 } from "react-icons/fa6";
 import { cn } from "@/lib/utils";
+import { CrystallBall } from "../CrystallBall";
 export default function SurfReport() {
   const { data: report, isLoading, error } = useNoaaSurfReport();
 
@@ -27,7 +28,7 @@ export default function SurfReport() {
     <div className="space-y-4">
       {report.discussion && report.discussion.length > 0 && (
         <>
-          {report.lastBuildDate && (
+          {/* {report.lastBuildDate && (
             <p className="text-2xl font-bold">
               {new Date(report.lastBuildDate).toLocaleString("en-US", {
                 month: "long",
@@ -35,15 +36,10 @@ export default function SurfReport() {
                 year: "numeric",
               })}
             </p>
-          )}
-          {report.poem?.map((line, index) => (
-            <div
-              key={index}
-              className="font-serif text-3xl text-muted-foreground italic"
-            >
-              {line}
-            </div>
-          ))}
+          )} */}
+          <div className="relative h-[100vh]">
+            <CrystallBall poem={report.poem} />
+          </div>
 
           <div className="flex flex-wrap gap-4">
             {report.waveHeights.map((wave, index) => (

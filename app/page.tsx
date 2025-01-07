@@ -7,7 +7,6 @@ import { Typewriter } from "@/components/typography";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import WeatherCheck from "@/components/WeatherCheck";
 import SurfReport from "@/components/SurfReport";
-import { CrystallBall } from "@/components/CrystallBall";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -19,46 +18,15 @@ const queryClient = new QueryClient({
 });
 
 export default function Home() {
-  const [currentStage, setCurrentStage] = useState(0);
   return (
     <QueryClientProvider client={queryClient}>
-      <main className="p-4 pb-32 font-semibold lg:px-8">
-        <section className="mx-auto max-w-8xl space-y-4">
+      <main className="font-semibold">
+        <section>
           <AnimatePresence>
-            {currentStage >= 0 && (
-              <motion.p key="stage-0" layout className="text-center">
-                <CrystallBall />
-                <Typewriter
-                  hideCursorOnComplete
-                  text="How art thou, surf?"
-                  onComplete={() => setCurrentStage(1)}
-                />
-              </motion.p>
-            )}
-            {currentStage >= 1 && (
-              <motion.div
-                layout
-                key="stage-1"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-                className="max-w-3xl mx-auto"
-              >
-                <SurfReport />
-              </motion.div>
-            )}
-            {currentStage >= 2 && (
-              <motion.div
-                layout
-                key="stage-2"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
-              ></motion.div>
-            )}
-            {currentStage >= 3 && <WeatherCheck />}
+            <p className="text-center fixed top-0 inset-x-0">
+              <Typewriter hideCursorOnComplete text="How art thou, surf?" />
+            </p>
+            <SurfReport />
           </AnimatePresence>
         </section>
       </main>
