@@ -1,11 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-
 import { Typewriter } from "@/components/typography";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import WeatherCheck from "@/components/WeatherCheck";
 import SurfReport from "@/components/SurfReport";
 
 const queryClient = new QueryClient({
@@ -22,12 +18,10 @@ export default function Home() {
     <QueryClientProvider client={queryClient}>
       <main className="font-semibold">
         <section>
-          <AnimatePresence>
-            <p className="text-center fixed top-0 inset-x-0">
-              <Typewriter hideCursorOnComplete text="How art thou, surf?" />
-            </p>
-            <SurfReport />
-          </AnimatePresence>
+          <p className="text-center absolute top-0 inset-x-0 px-8 text-4xl md:text-7xl">
+            <Typewriter hideCursorOnComplete text="How art thou, surf?" />
+          </p>
+          <SurfReport />
         </section>
       </main>
     </QueryClientProvider>

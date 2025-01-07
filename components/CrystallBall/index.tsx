@@ -5,7 +5,6 @@ import {
   Stars,
   Text,
 } from "@react-three/drei";
-import { useControls } from "leva";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 
@@ -110,6 +109,12 @@ const DiscoBall: React.FC<{ poem?: string[] }> = ({ poem }) => {
       onPointerDown={() => {
         isPointerDown.current = true;
         holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
+      }}
+      onPointerEnter={() => {
+        document.body.style.cursor = "pointer";
+      }}
+      onPointerLeave={() => {
+        document.body.style.cursor = "auto";
       }}
     >
       <sphereGeometry args={[1, 100, 100]} />
