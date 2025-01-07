@@ -21,10 +21,12 @@ const DiscoBall: React.FC<{ poem?: string[] }> = ({ poem }) => {
   const clockRef = useRef<THREE.Clock | undefined>(undefined);
 
   // Use fixed size instead of viewport for scale calculation
-  const scale = useMemo(
-    () => Math.min(size.width, size.height) / 500,
-    [size.width, size.height]
-  );
+  const scale = useMemo(() => {
+    const minDimension = Math.min(size.width, size.height);
+    // Adjust divisor based on viewport size
+    const divisor = minDimension < 768 ? 340 : 500;
+    return minDimension / divisor;
+  }, [size.width, size.height]);
 
   useFrame(({ clock }) => {
     clockRef.current = clock;
@@ -116,8 +118,8 @@ const DiscoBall: React.FC<{ poem?: string[] }> = ({ poem }) => {
         thickness={thickness}
         roughness={0.1}
         metalness={0}
-        chromaticAberration={0.2}
-        ior={1.45}
+        chromaticAberration={0.5}
+        ior={1.4}
         backside={false}
       />
       <Text
