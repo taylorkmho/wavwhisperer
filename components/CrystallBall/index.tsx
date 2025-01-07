@@ -7,6 +7,7 @@ import {
 } from "@react-three/drei";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
+import { cn } from "@/lib/utils";
 
 const INITIAL_THICKNESS = 40;
 
@@ -168,7 +169,7 @@ export const CrystallBall: React.FC<{
   poem?: string[];
 }> = ({ className, poem }) => {
   return (
-    <Canvas className={className}>
+    <Canvas className={cn("select-none", className)}>
       <directionalLight position={[10, 10, 10]} intensity={5} />
       <Environment preset="night" />
       <Scene poem={poem} />
