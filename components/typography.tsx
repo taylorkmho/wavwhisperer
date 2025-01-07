@@ -24,10 +24,12 @@ export function Typewriter({
   text,
   onComplete,
   hideCursorOnComplete = false,
+  className,
 }: {
   text: string;
   onComplete?: () => void;
   hideCursorOnComplete?: boolean;
+  className?: string;
 }) {
   const [displayedText, setDisplayedText] = useState("");
   const hasCompletedRef = useRef(false);
@@ -51,7 +53,7 @@ export function Typewriter({
   }, [text, onComplete]);
 
   return (
-    <span className="font-pixel font-medium leading-none">
+    <span className={cn("font-pixel font-medium leading-none", className)}>
       {displayedText}
       {(!hideCursorOnComplete || !hasCompletedRef.current) && (
         <motion.span

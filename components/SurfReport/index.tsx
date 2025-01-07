@@ -44,7 +44,7 @@ export default function SurfReport() {
                   })}
                 </p>
               )}
-              <div className="flex flex-wrap gap-4 justify-center px-4">
+              <div className="flex flex-wrap gap-4 justify-center px-4 pb-2">
                 {report.waveHeights.map((wave, index) => (
                   <div
                     key={index}
@@ -89,7 +89,7 @@ export default function SurfReport() {
               </div>
             </div>
           </div>
-          <div className="max-w-5xl mx-auto w-full pb-12 p-4 space-y-4">
+          <div className="max-w-5xl mx-auto w-full pb-12 px-4 space-y-4">
             <div className="space-y-2 text-sm text-secondary-foreground font-normal font-mono">
               {report.discussion.map((paragraph, index) => (
                 <p key={index}>{decode(paragraph)}</p>
