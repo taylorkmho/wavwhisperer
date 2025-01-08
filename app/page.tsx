@@ -1,9 +1,8 @@
 "use client";
 
-import { Typewriter } from "@/components/typography";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import SurfReport from "@/components/SurfReport";
-import { FaGithub, FaGithubAlt } from "react-icons/fa6";
+import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 

@@ -49,7 +49,7 @@ export default function SurfReport() {
               )}
               <Typewriter
                 hideCursorOnComplete
-                text="How art thou, surf?"
+                text="Rub the crystal ball"
                 className="text-4xl md:text-7xl"
               />
             </div>
