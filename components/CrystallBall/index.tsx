@@ -37,11 +37,15 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
 
   // Use fixed size instead of viewport for scale calculation
   const scale = useMemo(() => {
-    const minDimension = Math.min(size.width, size.height);
-    // Adjust divisor based on viewport size
-    const divisor = minDimension < 768 ? 340 : 500;
-    return minDimension / divisor;
-  }, [size.width, size.height]);
+    const viewportScale = size.width / 280; // Start aggressive
+    const maxScale = size.width < 768 ? 3 : 2.2; // Lower max scale for desktop
+    const minInset = size.width < 768 ? 20 : 100; // Bigger inset on desktop
+
+    // Ensure minimum inset from edges
+    const insetScale = (size.width - minInset * 2) / 280;
+
+    return Math.min(viewportScale, insetScale, maxScale);
+  }, [size.width]);
 
   useFrame(({ clock }) => {
     clockRef.current = clock;
