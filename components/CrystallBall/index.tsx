@@ -12,6 +12,8 @@ import { cn } from "@/lib/utils";
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;
 const HOLD_DURATION_SECONDS = 2;
+const FLOAT_SPEED = 0.25;
+const FLOAT_HEIGHT = 0.1;
 
 const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
   const { size } = useThree();
@@ -95,14 +97,21 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
         resistanceOffset.current.lerp(targetOffset, 0.1);
         mesh.current.position.copy(resistanceOffset.current);
       } else {
-        // Return to center when not pressed
-        resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
+        // Only float if thickness is not at final value
+        if (thickness > FINAL_THICKNESS + 0.01) {
+          const time = state.clock.getElapsedTime();
+          const floatY = Math.sin(time * FLOAT_SPEED) * FLOAT_HEIGHT;
+          resistanceOffset.current.lerp(new THREE.Vector3(0, floatY, 0), 0.1);
+        } else {
+          // Return to center position when "tapped"
+          resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
+        }
         mesh.current.position.copy(resistanceOffset.current);
       }
 
-      mesh.current.rotation.x += 0.001;
-      mesh.current.rotation.y += 0.001;
-      mesh.current.rotation.z -= 0.001;
+      mesh.current.rotation.x += 0.005;
+      mesh.current.rotation.y += 0.005;
+      mesh.current.rotation.z -= 0.005;
       // stop rotation if thickness is less than 0.026 and interpolate to the nearest multiple of 360
       if (thickness < FINAL_THICKNESS + 0.01) {
         mesh.current.rotation.y = THREE.MathUtils.lerp(
