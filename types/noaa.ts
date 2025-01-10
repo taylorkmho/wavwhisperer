@@ -12,12 +12,11 @@ export const waveHeightSchema = z.object({
 
 // Surf Report Schema
 export const surfReportSchema = z.object({
+  id: z.string().uuid(),
   lastBuildDate: z.string(),
   lastBuildDateObject: z.date(),
   discussion: z.array(z.string()),
   waveHeights: z.array(waveHeightSchema),
-  poem: z.array(z.string()).optional(),
-  model: z.string().optional(),
 });
 
 // Types inferred from schemas

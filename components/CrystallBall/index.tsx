@@ -5,16 +5,29 @@ import {
   Stars,
   Text,
 } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { cn } from "@/lib/utils";
 
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;
 const HOLD_DURATION_SECONDS = 2;
-const PUSH_RESISTANCE = 0.1;
+const FLOAT_SPEED = 0.25;
+const FLOAT_HEIGHT = 0.1;
 
-const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
+interface SceneProps {
+  discussion: string[];
+  surfReportId: string;
+  onGenerate: (poem: string[]) => void;
+  poem?: string[];
+}
+
+const Scene: React.FC<SceneProps> = ({
+  discussion,
+  surfReportId,
+  onGenerate,
+  poem,
+}) => {
   const { size } = useThree();
   const mesh = useRef<THREE.Mesh>(null);
   const [thickness, setThickness] = useState(INITIAL_THICKNESS);
@@ -30,6 +43,11 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
   const resistanceOffset = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
   const isMobile = useMemo(() => size.width < 768, [size.width]);
 
+  // Add push resistance calculation
+  const pushResistance = useMemo(() => {
+    return size.width < 768 ? 0.2 : 0.1;
+  }, [size.width]);
+
   // Add useEffect to set camera position only once on mount
   useEffect(() => {
     camera.position.set(0, 0, 4);
@@ -37,11 +55,15 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
 
   // Use fixed size instead of viewport for scale calculation
   const scale = useMemo(() => {
-    const minDimension = Math.min(size.width, size.height);
-    // Adjust divisor based on viewport size
-    const divisor = minDimension < 768 ? 340 : 500;
-    return minDimension / divisor;
-  }, [size.width, size.height]);
+    const viewportScale = size.width / 280; // Start aggressive
+    const maxScale = size.width < 768 ? 3 : 2.2; // Lower max scale for desktop
+    const minInset = size.width < 768 ? 20 : 100; // Bigger inset on desktop
+
+    // Ensure minimum inset from edges
+    const insetScale = (size.width - minInset * 2) / 280;
+
+    return Math.min(viewportScale, insetScale, maxScale);
+  }, [size.width]);
 
   useFrame(({ clock }) => {
     clockRef.current = clock;
@@ -71,28 +93,37 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
     );
   });
 
-  useFrame(({ mouse }) => {
+  useFrame((state) => {
     if (mesh.current) {
       if (isPointerDown.current && pointerPosition) {
+        // Replace mouse.x/y with pointer.x/y
+        const pointer = state.pointer;
         // Calculate resistance effect
         const targetOffset = new THREE.Vector3(
-          (mouse.x - pointerPosition.x) * PUSH_RESISTANCE,
-          (mouse.y - pointerPosition.y) * PUSH_RESISTANCE,
-          -PUSH_RESISTANCE // Add z-axis movement
+          (pointer.x - pointerPosition.x) * pushResistance,
+          (pointer.y - pointerPosition.y) * pushResistance,
+          -pushResistance // Update z-axis movement
         );
 
         // Apply spring-like behavior
         resistanceOffset.current.lerp(targetOffset, 0.1);
         mesh.current.position.copy(resistanceOffset.current);
       } else {
-        // Return to center when not pressed
-        resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
+        // Only float if thickness is not at final value
+        if (thickness > FINAL_THICKNESS + 0.01) {
+          const time = state.clock.getElapsedTime();
+          const floatY = Math.sin(time * FLOAT_SPEED) * FLOAT_HEIGHT;
+          resistanceOffset.current.lerp(new THREE.Vector3(0, floatY, 0), 0.1);
+        } else {
+          // Return to center position when "tapped"
+          resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
+        }
         mesh.current.position.copy(resistanceOffset.current);
       }
 
-      mesh.current.rotation.x += 0.001;
-      mesh.current.rotation.y += 0.001;
-      mesh.current.rotation.z -= 0.001;
+      mesh.current.rotation.x += 0.005;
+      mesh.current.rotation.y += 0.005;
+      mesh.current.rotation.z -= 0.005;
       // stop rotation if thickness is less than 0.026 and interpolate to the nearest multiple of 360
       if (thickness < FINAL_THICKNESS + 0.01) {
         mesh.current.rotation.y = THREE.MathUtils.lerp(
@@ -147,25 +178,51 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
     }
   }, [mesh]);
 
+  const generateNewPoem = async () => {
+    try {
+      const response = await fetch("/api/generations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ discussion, surfReportId }),
+      });
+
+      if (!response.ok) throw new Error("Generation failed");
+
+      const generation = await response.json();
+      onGenerate(generation.poem);
+    } catch (error) {
+      console.error("Failed to generate poem:", error);
+    }
+  };
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    isPointerDown.current = true;
+    holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
+    setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
+
+    // Generate new poem when thickness reaches final value
+    if (thickness <= FINAL_THICKNESS + 0.01) {
+      generateNewPoem();
+    }
+  };
+
   return (
     <Suspense fallback={null}>
       <Stars
         radius={10}
-        depth={500}
+        depth={250}
         count={1000}
-        factor={20}
+        factor={5}
         saturation={0}
-        fade
         speed={0.5}
+        fade
       />
       <mesh
         ref={mesh}
         scale={scale}
-        onPointerDown={(e) => {
-          isPointerDown.current = true;
-          holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
-          setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
-        }}
+        onPointerDown={handlePointerDown}
         onPointerMove={(e) => {
           if (isPointerDown.current) {
             lastPointerPosition.current = pointerPosition;
@@ -207,12 +264,20 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
 export const CrystallBall: React.FC<{
   className?: string;
   poem?: string[];
-}> = ({ className, poem }) => {
+  discussion: string[];
+  surfReportId: string;
+  onGenerate: (poem: string[]) => void;
+}> = ({ className, poem, discussion, surfReportId, onGenerate }) => {
   return (
     <Canvas className={cn("select-none", className)}>
       <directionalLight position={[10, 10, 10]} intensity={5} />
       <Environment preset="night" />
-      <Scene poem={poem} />
+      <Scene
+        poem={poem}
+        discussion={discussion}
+        surfReportId={surfReportId}
+        onGenerate={onGenerate}
+      />
     </Canvas>
   );
 };
