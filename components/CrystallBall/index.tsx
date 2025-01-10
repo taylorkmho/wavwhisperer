@@ -170,12 +170,12 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
     <Suspense fallback={null}>
       <Stars
         radius={10}
-        depth={500}
+        depth={250}
         count={1000}
-        factor={20}
+        factor={5}
         saturation={0}
-        fade
         speed={0.5}
+        fade
       />
       <mesh
         ref={mesh}
