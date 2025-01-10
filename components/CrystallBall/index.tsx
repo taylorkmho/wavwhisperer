@@ -12,7 +12,6 @@ import { cn } from "@/lib/utils";
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;
 const HOLD_DURATION_SECONDS = 2;
-const PUSH_RESISTANCE = 0.1;
 
 const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
   const { size } = useThree();
@@ -29,6 +28,11 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
   const lastPointerPosition = useRef<THREE.Vector2 | null>(null);
   const resistanceOffset = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
   const isMobile = useMemo(() => size.width < 768, [size.width]);
+
+  // Add push resistance calculation
+  const pushResistance = useMemo(() => {
+    return size.width < 768 ? 0.2 : 0.1;
+  }, [size.width]);
 
   // Add useEffect to set camera position only once on mount
   useEffect(() => {
@@ -75,14 +79,16 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
     );
   });
 
-  useFrame(({ mouse }) => {
+  useFrame((state) => {
     if (mesh.current) {
       if (isPointerDown.current && pointerPosition) {
+        // Replace mouse.x/y with pointer.x/y
+        const pointer = state.pointer;
         // Calculate resistance effect
         const targetOffset = new THREE.Vector3(
-          (mouse.x - pointerPosition.x) * PUSH_RESISTANCE,
-          (mouse.y - pointerPosition.y) * PUSH_RESISTANCE,
-          -PUSH_RESISTANCE // Add z-axis movement
+          (pointer.x - pointerPosition.x) * pushResistance,
+          (pointer.y - pointerPosition.y) * pushResistance,
+          -pushResistance // Update z-axis movement
         );
 
         // Apply spring-like behavior
