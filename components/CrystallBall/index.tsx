@@ -5,7 +5,7 @@ import {
   Stars,
   Text,
 } from "@react-three/drei";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
+import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
 import * as THREE from "three";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +15,19 @@ const HOLD_DURATION_SECONDS = 2;
 const FLOAT_SPEED = 0.25;
 const FLOAT_HEIGHT = 0.1;
 
-const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
+interface SceneProps {
+  discussion: string[];
+  surfReportId: string;
+  onGenerate: (poem: string[]) => void;
+  poem?: string[];
+}
+
+const Scene: React.FC<SceneProps> = ({
+  discussion,
+  surfReportId,
+  onGenerate,
+  poem,
+}) => {
   const { size } = useThree();
   const mesh = useRef<THREE.Mesh>(null);
   const [thickness, setThickness] = useState(INITIAL_THICKNESS);
@@ -166,6 +178,36 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
     }
   }, [mesh]);
 
+  const generateNewPoem = async () => {
+    try {
+      const response = await fetch("/api/generations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ discussion, surfReportId }),
+      });
+
+      if (!response.ok) throw new Error("Generation failed");
+
+      const generation = await response.json();
+      onGenerate(generation.poem);
+    } catch (error) {
+      console.error("Failed to generate poem:", error);
+    }
+  };
+
+  const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    isPointerDown.current = true;
+    holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
+    setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
+
+    // Generate new poem when thickness reaches final value
+    if (thickness <= FINAL_THICKNESS + 0.01) {
+      generateNewPoem();
+    }
+  };
+
   return (
     <Suspense fallback={null}>
       <Stars
@@ -180,11 +222,7 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
       <mesh
         ref={mesh}
         scale={scale}
-        onPointerDown={(e) => {
-          isPointerDown.current = true;
-          holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
-          setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
-        }}
+        onPointerDown={handlePointerDown}
         onPointerMove={(e) => {
           if (isPointerDown.current) {
             lastPointerPosition.current = pointerPosition;
@@ -226,12 +264,20 @@ const Scene: React.FC<{ poem?: string[] }> = ({ poem }) => {
 export const CrystallBall: React.FC<{
   className?: string;
   poem?: string[];
-}> = ({ className, poem }) => {
+  discussion: string[];
+  surfReportId: string;
+  onGenerate: (poem: string[]) => void;
+}> = ({ className, poem, discussion, surfReportId, onGenerate }) => {
   return (
     <Canvas className={cn("select-none", className)}>
       <directionalLight position={[10, 10, 10]} intensity={5} />
       <Environment preset="night" />
-      <Scene poem={poem} />
+      <Scene
+        poem={poem}
+        discussion={discussion}
+        surfReportId={surfReportId}
+        onGenerate={onGenerate}
+      />
     </Canvas>
   );
 };

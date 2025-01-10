@@ -10,10 +10,17 @@ import {
 import { cn } from "@/lib/utils";
 import { CrystallBall } from "../CrystallBall";
 import { Typewriter } from "../typography";
-export default function SurfReport() {
-  const { data: report, isLoading, error } = useNoaaSurfReport();
+import { useState } from "react";
 
-  if (isLoading) {
+export default function SurfReport() {
+  const {
+    data: report,
+    isLoading: reportLoading,
+    error: reportError,
+  } = useNoaaSurfReport();
+  const [currentPoem, setCurrentPoem] = useState<string[]>([]);
+
+  if (reportLoading) {
     return (
       <div className="w-screen h-screen flex items-center justify-center">
         Telling future...
@@ -21,8 +28,8 @@ export default function SurfReport() {
     );
   }
 
-  if (error) {
-    return <div>Error loading surf report</div>;
+  if (reportError) {
+    return <div>Error loading data: {reportError.message}</div>;
   }
 
   if (!report) {
@@ -53,7 +60,12 @@ export default function SurfReport() {
                 className="text-4xl md:text-7xl"
               />
             </div>
-            <CrystallBall poem={report.poem} />
+            <CrystallBall
+              poem={currentPoem}
+              discussion={report.discussion}
+              surfReportId={report.id}
+              onGenerate={setCurrentPoem}
+            />
             <div className="absolute bottom-4 inset-x-0 flex flex-col gap-2">
               <div className="flex flex-wrap gap-4 justify-center px-4 pb-2">
                 {report.waveHeights.map((wave, index) => (
