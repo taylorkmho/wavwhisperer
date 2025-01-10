@@ -70,6 +70,19 @@ The final limerick should convey key forecast information within this strict for
         },
         {
           role: "user",
+          content: `The first of a series of large to extra large northwest swells is due this weekend. Long period forerunners are expected Saturday morning&#44; will build quickly down the island chain Saturday afternoon and peak Saturday night and early Sunday. Another round of large to extra large northwest swell is expected Monday through Thursday next week. Surf along east and south facing shores will remain small through the forecast period.`,
+        },
+        {
+          role: "assistant",
+          content: `
+The long-period swells creep their way
+Through Saturday's dawn, they won't stay
+While east shores lie flat
+Next week brings more that
+A four-day XL wave buffet!`,
+        },
+        {
+          role: "user",
           content: discussion.join("\n"),
         },
       ],
