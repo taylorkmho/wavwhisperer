@@ -1,9 +1,9 @@
-import { supabaseAdmin } from "../supabase/admin-client";
+import { parseNoaaReport } from "@/lib/noaa/parser";
 import {
   surfReportRecordSchema,
   type SurfReportRecord,
 } from "@/types/database";
-import { parseNoaaReport } from "@/lib/noaa/parser";
+import { supabaseAdmin } from "../supabase/admin-client";
 
 export class SurfReportServerService {
   static async saveReport(xmlData: string): Promise<SurfReportRecord> {

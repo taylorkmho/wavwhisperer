@@ -11,7 +11,7 @@ export function Glow({ children, className, ...props }: GlowProps) {
       <div className="relative z-10">{children}</div>
       <span
         className={cn(
-          "absolute inset-0 -z-10 animate-glow bg-gradient-to-l from-cyan-500/80 via-amber-500/80 to-violet-500/80 bg-[length:200%_200%] blur-xl",
+          "animate-glow absolute inset-0 -z-10 bg-gradient-to-l from-cyan-500/80 via-amber-500/80 to-violet-500/80 bg-[length:200%_200%] blur-xl",
           className
         )}
       />

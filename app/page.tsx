@@ -1,10 +1,10 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import SurfReport from "@/components/SurfReport";
-import { FaGithub } from "react-icons/fa6";
 import { Button } from "@/components/ui/button";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Link from "next/link";
+import { FaGithub } from "react-icons/fa6";
 
 const queryClient = new QueryClient({
   defaultOptions: {

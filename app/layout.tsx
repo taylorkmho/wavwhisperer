@@ -1,6 +1,6 @@
+import { fontPixel, fontSans, fontSerif } from "@/lib/fonts";
 import type { Metadata } from "next/types";
 import "./globals.css";
-import { fontSans, fontSerif, fontPixel } from "@/lib/fonts";
 
 export const metadata: Metadata = {
   title: "Wave Whisperer",
@@ -15,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${fontSans.variable} ${fontSerif.variable} ${fontPixel.variable} ${fontSans.className} antialiased dark`}
+        className={`${fontSans.variable} ${fontSerif.variable} ${fontPixel.variable} ${fontSans.className} dark antialiased`}
       >
         {children}
       </body>

@@ -1,6 +1,6 @@
-import { useQuery } from "@tanstack/react-query";
 import { SurfReportClientService } from "@/lib/services/surf-report.client";
 import { surfReportSchema, type SurfReport } from "@/types/noaa";
+import { useQuery } from "@tanstack/react-query";
 
 export function useNoaaSurfReport() {
   return useQuery<SurfReport>({

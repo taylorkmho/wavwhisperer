@@ -1,13 +1,13 @@
-import { Suspense, useEffect, useRef, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 import {
   Environment,
   MeshTransmissionMaterial,
   Stars,
   Text,
 } from "@react-three/drei";
-import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
+import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { cn } from "@/lib/utils";
 
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;

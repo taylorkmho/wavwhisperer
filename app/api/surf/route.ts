@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { parseNoaaReport } from "@/lib/noaa/parser";
+import { NextResponse } from "next/server";
 
 const NOAA_URL = "https://www.weather.gov/source/hfo/xml/SurfState.xml";
 

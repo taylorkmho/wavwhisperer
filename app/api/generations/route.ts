@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
 import { generateSurfLimerick } from "@/lib/openai/client";
 import { supabaseAdmin } from "@/lib/supabase/admin-client";
 import { generationRecordSchema } from "@/types/database";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   try {

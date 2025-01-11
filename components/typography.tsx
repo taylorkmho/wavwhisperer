@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 export const Label: React.FC<{
   children: string | React.ReactNode;

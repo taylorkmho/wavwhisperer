@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
 
-import { generateWeatherResponse } from "@/lib/openai/functions";
-import { Button } from "@/components/ui/button";
 import { Typewriter } from "@/components/typography";
+import { Button } from "@/components/ui/button";
+import { generateWeatherResponse } from "@/lib/openai/functions";
 
 import { useWeather } from "../../hooks/useWeather";
 import WeatherCard from "../WeatherCard";

@@ -1,8 +1,8 @@
-import { supabase } from "../supabase/client";
 import {
   surfReportRecordSchema,
   type SurfReportRecord,
 } from "@/types/database";
+import { supabase } from "../supabase/client";
 
 export class SurfReportClientService {
   static async getLatestReport(): Promise<SurfReportRecord | null> {

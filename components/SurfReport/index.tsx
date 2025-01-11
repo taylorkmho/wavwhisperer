@@ -1,16 +1,15 @@
+import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
+import { cn } from "@/lib/utils";
 import { decode } from "html-entities";
 import Image from "next/image";
-import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
 import Link from "next/link";
+import { useState } from "react";
 import {
   FaArrowRightLong,
   FaArrowTrendDown,
   FaArrowTrendUp,
 } from "react-icons/fa6";
-import { cn } from "@/lib/utils";
 import { CrystallBall } from "../CrystallBall";
-import { Typewriter } from "../typography";
-import { useState } from "react";
 
 export default function SurfReport() {
   const {
@@ -22,7 +21,7 @@ export default function SurfReport() {
 
   if (reportLoading) {
     return (
-      <div className="w-screen h-screen flex items-center justify-center">
+      <div className="flex h-screen w-screen items-center justify-center">
         Telling future...
       </div>
     );
@@ -41,9 +40,9 @@ export default function SurfReport() {
       {report.discussion && report.discussion.length > 0 && (
         <>
           <div className="relative h-[100vh]">
-            <div className="z-10 pt-2 text-center absolute top-0 inset-x-0 px-8 flex flex-col items-center justify-center">
+            <div className="absolute inset-x-0 left-2 top-0 z-10 flex flex-col items-center gap-2 pt-2">
               {report.lastBuildDate && (
-                <p className="text-xs md:text-sm text-center px-2 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 border border-fuchsia-500/20 rounded-md">
+                <p className="rounded-md border border-fuchsia-500/20 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 px-2 text-xs md:text-sm">
                   Hawai‘i surf report{" "}
                   <strong>
                     {new Date(report.lastBuildDate).toLocaleString("en-US", {
@@ -66,36 +65,36 @@ export default function SurfReport() {
               surfReportId={report.id}
               onGenerate={setCurrentPoem}
             />
-            <div className="absolute bottom-4 inset-x-0 flex flex-col gap-2">
-              <div className="flex flex-wrap gap-4 justify-center px-4 pb-2">
+            <div className="absolute inset-x-0 bottom-4 flex flex-col gap-2">
+              <div className="flex flex-wrap justify-center gap-4 px-4 pb-2">
                 {report.waveHeights.map((wave, index) => (
                   <div
                     key={index}
                     className="flex items-center gap-2 text-center text-card-foreground"
                   >
-                    <h6 className="font-semibold text-muted-foreground text-xs">
+                    <h6 className="text-xs font-semibold text-muted-foreground">
                       {wave.direction}
                     </h6>
 
-                    <span className="text-sm md:text-base text-secondary-foreground font-bold">
+                    <span className="text-sm font-bold text-secondary-foreground md:text-base">
                       {wave.height} ft
                     </span>
                     <span
                       className={cn(
-                        "flex items-center gap-1.5 text-xs rounded-full px-2 h-5",
+                        "flex h-5 items-center gap-1.5 rounded-full px-2 text-xs",
                         wave.trend === "increasing" &&
-                          "text-green-500 bg-green-500/10",
+                          "bg-green-500/10 text-green-500",
                         wave.trend === "decreasing" &&
-                          "text-red-500 bg-red-500/10",
+                          "bg-red-500/10 text-red-500",
                         wave.trend === "steady" &&
-                          "text-muted-foreground bg-muted-foreground/10"
+                          "bg-muted-foreground/10 text-muted-foreground"
                       )}
                       title={
                         wave.trend === "increasing"
                           ? "Increasing"
                           : wave.trend === "decreasing"
-                          ? "Decreasing"
-                          : "Steady"
+                            ? "Decreasing"
+                            : "Steady"
                       }
                     >
                       {wave.trend &&
@@ -112,8 +111,8 @@ export default function SurfReport() {
               </div>
             </div>
           </div>
-          <div className="max-w-5xl mx-auto w-full pb-12 px-4 space-y-4">
-            <div className="space-y-2 text-sm text-secondary-foreground font-normal font-mono">
+          <div className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-12">
+            <div className="space-y-2 font-mono text-sm font-normal text-secondary-foreground">
               {report.discussion.map((paragraph, index) => (
                 <p key={index}>{decode(paragraph)}</p>
               ))}
@@ -125,13 +124,13 @@ export default function SurfReport() {
                 width={28}
                 height={28}
               />
-              <h6 className="flex flex-col leading-none gap-0.5">
+              <h6 className="flex flex-col gap-0.5 leading-none">
                 <span className="text-muted-foreground">
                   Report data pulled from
                 </span>{" "}
                 <Link
                   href="https://www.weather.gov/hfo/SRF"
-                  className="font-bold hover:underline underline-offset-2 decoration-foreground/50"
+                  className="font-bold decoration-foreground/50 underline-offset-2 hover:underline"
                   target="_blank"
                 >
                   National Oceanic and Atmospheric Administration
