@@ -1,14 +1,15 @@
 import { cn } from "@/lib/utils";
 import { WaveHeight } from "@/types/noaa";
 import Link from "next/link";
-import { FaAngleDown, FaGithub } from "react-icons/fa6";
+import { FaEllipsis, FaGithub } from "react-icons/fa6";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
   waveHeights: WaveHeight[];
+  onClickDropdown: () => void;
 }
 
-export function BottomNav({ waveHeights }: BottomNavProps) {
+export function BottomNav({ waveHeights, onClickDropdown }: BottomNavProps) {
   return (
     <nav className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
       <div className="relative inline-flex grow overflow-x-auto">
@@ -23,13 +24,12 @@ export function BottomNav({ waveHeights }: BottomNavProps) {
       >
         <FaGithub className="size-4 transition-transform group-hover:scale-125" />
       </Link>
-      <Link
-        href="https://github.com/taylorkmho/wavewhisperer"
-        target="_blank"
+      <button
+        onClick={onClickDropdown}
         className="inline-flex h-full shrink-0 items-center pl-2 pr-3 hover:bg-white/5"
       >
-        <FaAngleDown className="size-4" />
-      </Link>
+        <FaEllipsis className="size-4" />
+      </button>
       {["bg-gradient-to-r right-16", "bg-gradient-to-l left-0"].map(
         (classNames, i) => (
           <div
