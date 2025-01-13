@@ -1,13 +1,13 @@
-import { Suspense, useEffect, useRef, useMemo, useState } from "react";
+import { cn } from "@/lib/utils";
 import {
   Environment,
   MeshTransmissionMaterial,
   Stars,
   Text,
 } from "@react-three/drei";
-import { Canvas, useFrame, useThree, ThreeEvent } from "@react-three/fiber";
+import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
-import { cn } from "@/lib/utils";
 
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;
@@ -16,18 +16,10 @@ const FLOAT_SPEED = 0.25;
 const FLOAT_HEIGHT = 0.1;
 
 interface SceneProps {
-  discussion: string[];
-  surfReportId: string;
-  onGenerate: (poem: string[]) => void;
   poem?: string[];
 }
 
-const Scene: React.FC<SceneProps> = ({
-  discussion,
-  surfReportId,
-  onGenerate,
-  poem,
-}) => {
+const Scene: React.FC<SceneProps> = ({ poem }) => {
   const { size } = useThree();
   const mesh = useRef<THREE.Mesh>(null);
   const [thickness, setThickness] = useState(INITIAL_THICKNESS);
@@ -45,8 +37,8 @@ const Scene: React.FC<SceneProps> = ({
 
   // Add push resistance calculation
   const pushResistance = useMemo(() => {
-    return size.width < 768 ? 0.2 : 0.1;
-  }, [size.width]);
+    return isMobile ? 0.2 : 0.1;
+  }, [isMobile]);
 
   // Add useEffect to set camera position only once on mount
   useEffect(() => {
@@ -55,15 +47,29 @@ const Scene: React.FC<SceneProps> = ({
 
   // Use fixed size instead of viewport for scale calculation
   const scale = useMemo(() => {
-    const viewportScale = size.width / 280; // Start aggressive
-    const maxScale = size.width < 768 ? 3 : 2.2; // Lower max scale for desktop
-    const minInset = size.width < 768 ? 20 : 100; // Bigger inset on desktop
+    // Base scale calculations using both width and height
+    const widthScale = size.width / 280;
+    const heightScale = size.height / 280;
+    const baseScale = Math.min(widthScale, heightScale);
 
-    // Ensure minimum inset from edges
+    // Adjusted parameters for mobile vs desktop
+    const maxScale = 2.2; // Same for both
+    const minScale = isMobile ? 1.6 : 1.8;
+    const minInset = isMobile ? 40 : 100;
+
+    // Calculate scale with inset constraints
     const insetScale = (size.width - minInset * 2) / 280;
 
-    return Math.min(viewportScale, insetScale, maxScale);
-  }, [size.width]);
+    // Apply a multiplier to width-based scales to maintain roundness
+    const widthMultiplier = isMobile ? 1.2 : 1.0;
+    const adjustedInsetScale = insetScale * widthMultiplier;
+
+    // Return the constrained scale value
+    return Math.max(
+      minScale,
+      Math.min(baseScale * widthMultiplier, adjustedInsetScale, maxScale)
+    );
+  }, [size.width, size.height, isMobile]);
 
   useFrame(({ clock }) => {
     clockRef.current = clock;
@@ -178,34 +184,10 @@ const Scene: React.FC<SceneProps> = ({
     }
   }, [mesh]);
 
-  const generateNewPoem = async () => {
-    try {
-      const response = await fetch("/api/generations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ discussion, surfReportId }),
-      });
-
-      if (!response.ok) throw new Error("Generation failed");
-
-      const generation = await response.json();
-      onGenerate(generation.poem);
-    } catch (error) {
-      console.error("Failed to generate poem:", error);
-    }
-  };
-
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     isPointerDown.current = true;
     holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
     setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
-
-    // Generate new poem when thickness reaches final value
-    if (thickness <= FINAL_THICKNESS + 0.01) {
-      generateNewPoem();
-    }
   };
 
   return (
@@ -261,23 +243,15 @@ const Scene: React.FC<SceneProps> = ({
   );
 };
 
-export const CrystallBall: React.FC<{
+export const CrystalBall: React.FC<{
   className?: string;
   poem?: string[];
-  discussion: string[];
-  surfReportId: string;
-  onGenerate: (poem: string[]) => void;
-}> = ({ className, poem, discussion, surfReportId, onGenerate }) => {
+}> = ({ className, poem }) => {
   return (
     <Canvas className={cn("select-none", className)}>
       <directionalLight position={[10, 10, 10]} intensity={5} />
       <Environment preset="night" />
-      <Scene
-        poem={poem}
-        discussion={discussion}
-        surfReportId={surfReportId}
-        onGenerate={onGenerate}
-      />
+      <Scene poem={poem} />
     </Canvas>
   );
 };

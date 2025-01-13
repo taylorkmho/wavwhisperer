@@ -1,14 +1,14 @@
-import { supabase } from "../supabase/client";
 import {
   surfReportRecordSchema,
   type SurfReportRecord,
 } from "@/types/database";
+import { supabase } from "../supabase/client";
 
 export class SurfReportClientService {
   static async getLatestReport(): Promise<SurfReportRecord | null> {
     const { data, error } = await supabase
       .from("surf_reports")
-      .select("*")
+      .select("id, last_build_date, discussion, wave_heights, poem, model")
       .order("created_at", { ascending: false })
       .limit(1)
       .single();

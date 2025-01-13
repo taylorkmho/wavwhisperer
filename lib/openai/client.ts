@@ -13,15 +13,14 @@ export const withOpenAIErrorHandler = async <T>(
     return await fn();
   } catch (error) {
     if (error instanceof OpenAI.APIError) {
-      // Handle rate limits
       if (error.status === 429) {
         throw new Error("Rate limit exceeded. Please try again later.");
       }
-      // Handle invalid requests
       if (error.status === 400) {
-        throw new Error(
-          `Invalid request. Please check your inputs. ${error.message}`
-        );
+        throw new Error(`Invalid request: ${error.message}`);
+      }
+      if (error.status === 401) {
+        throw new Error("Invalid API key or unauthorized access.");
       }
     }
     throw error;
@@ -48,15 +47,19 @@ LIMERICK STRUCTURE
 1. Opening (Lines 1-2):
   - Establish dominant swell(s) direction (e.g. north, west)
   - Both lines rhyme (sound A)
+  - The rhythm pattern is anapestic, which means the emphasis goes "da da DUM, da da DUM" (weak weak STRONG). In written form, it looks like this:
+    - da da DUM da da DUM da da DUM
 
 2. Middle (Line 3-4):
   - Contrast with remaining, non-dominant swells/shores
   - Shorter lines
   - Both lines rhyme (sound B)
+  - da da DUM da da
 
 3. Conclusion (Line 5):
   - Return to Line 1-2's rhyme (A)
   - Return to longer meter
+  - da da DUM da da DUM da da DUM
 
 STRICT REQUIREMENTS
 - Exactly 5 lines, with each on a new line

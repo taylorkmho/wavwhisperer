@@ -1,12 +1,16 @@
-import { supabaseAdmin } from "../supabase/admin-client";
+import { parseNoaaReport } from "@/lib/noaa/parser";
 import {
   surfReportRecordSchema,
   type SurfReportRecord,
 } from "@/types/database";
-import { parseNoaaReport } from "@/lib/noaa/parser";
+import { supabaseAdmin } from "../supabase/admin-client";
 
 export class SurfReportServerService {
-  static async saveReport(xmlData: string): Promise<SurfReportRecord> {
+  static async saveReport(
+    xmlData: string,
+    poem: string[],
+    model: string
+  ): Promise<SurfReportRecord> {
     const parsedReport = parseNoaaReport(xmlData);
 
     const record = {
@@ -14,6 +18,8 @@ export class SurfReportServerService {
       discussion: parsedReport.discussion,
       wave_heights: parsedReport.waveHeights,
       raw_xml: xmlData,
+      poem,
+      model,
     };
 
     const { data, error } = await supabaseAdmin
