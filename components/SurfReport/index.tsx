@@ -10,13 +10,9 @@ import { BottomNav } from "./BottomNav";
 import { CrystalBall } from "./CrystalBall";
 
 export default function SurfReport() {
-  const {
-    data: report,
-    isLoading: reportLoading,
-    error: reportError,
-  } = useNoaaSurfReport();
+  const { data, isLoading, error } = useNoaaSurfReport();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  if (reportLoading) {
+  if (isLoading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
         Telling future...
@@ -24,25 +20,25 @@ export default function SurfReport() {
     );
   }
 
-  if (reportError) {
-    return <div>Error loading data: {reportError.message}</div>;
+  if (error) {
+    return <div>Error loading data: {error.message}</div>;
   }
 
-  if (!report) {
+  if (!data) {
     return null;
   }
 
   return (
     <div className="space-y-4">
-      {report.discussion && report.discussion.length > 0 && (
+      {data.discussion && data.discussion.length > 0 && (
         <>
-          <section className="relative h-screen w-screen overflow-hidden border-2 border-red-400">
+          <section className="relative h-screen w-screen overflow-hidden">
             <div className="absolute inset-x-0 z-10 flex flex-col items-center gap-2 pt-2">
-              {report.lastBuildDate && (
+              {data.lastBuildDate && (
                 <p className="rounded-md border-2 border-fuchsia-500/20 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 px-2 text-xs md:text-sm">
                   Hawai‘i surf report{" "}
                   <strong>
-                    {new Date(report.lastBuildDate).toLocaleString("en-US", {
+                    {new Date(data.lastBuildDate).toLocaleString("en-US", {
                       month: "long",
                       day: "numeric",
                       year: "numeric",
@@ -54,7 +50,7 @@ export default function SurfReport() {
                 Rub the crystal ball
               </h1>
             </div>
-            <CrystalBall poem={report.poem} />
+            <CrystalBall poem={data.poem} />
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
@@ -66,7 +62,7 @@ export default function SurfReport() {
                 >
                   <div className="relative mx-auto max-w-lg overflow-hidden rounded-xl bg-muted font-mono text-sm font-normal text-muted-foreground">
                     <div className="max-h-48 space-y-2 overflow-y-auto p-4">
-                      {report.discussion.map((paragraph, index) => (
+                      {data.discussion.map((paragraph, index) => (
                         <p key={index}>{decode(paragraph)}</p>
                       ))}
                     </div>
@@ -120,14 +116,10 @@ export default function SurfReport() {
                   initial={{ opacity: 0, y: 100 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 100 }}
-                  transition={{
-                    enter: { delay: 1 },
-                    exit: { delay: 0 },
-                  }}
                   key="bottom-nav"
                 >
                   <BottomNav
-                    waveHeights={report.waveHeights}
+                    waveHeights={data.waveHeights}
                     onClickDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
                   />
                 </motion.div>
