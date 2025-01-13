@@ -1,5 +1,4 @@
 import { parseNoaaReport } from "@/lib/noaa/parser";
-import { generateSurfLimerick } from "@/lib/openai/client";
 import {
   surfReportRecordSchema,
   type SurfReportRecord,
@@ -7,9 +6,12 @@ import {
 import { supabaseAdmin } from "../supabase/admin-client";
 
 export class SurfReportServerService {
-  static async saveReport(xmlData: string): Promise<SurfReportRecord> {
+  static async saveReport(
+    xmlData: string,
+    poem: string[],
+    model: string
+  ): Promise<SurfReportRecord> {
     const parsedReport = parseNoaaReport(xmlData);
-    const { poem, model } = await generateSurfLimerick(parsedReport.discussion);
 
     const record = {
       last_build_date: parsedReport.lastBuildDate,

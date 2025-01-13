@@ -1,3 +1,5 @@
+import { parseNoaaReport } from "@/lib/noaa/parser";
+import { generateSurfLimerick } from "@/lib/openai/client";
 import { SurfReportServerService } from "@/lib/services/surf-report.server";
 import { NextResponse } from "next/server";
 
@@ -27,9 +29,18 @@ export async function GET(request: Request) {
     const xmlText = await response.text();
     console.log("Received XML length:", xmlText.length);
 
+    // Parse report and generate limerick
+    const parsedReport = parseNoaaReport(xmlText);
+    console.log("Generating limerick...");
+    const { poem, model } = await generateSurfLimerick(parsedReport.discussion);
+
     // Save to Supabase using server service
     console.log("Saving to Supabase...");
-    const savedReport = await SurfReportServerService.saveReport(xmlText);
+    const savedReport = await SurfReportServerService.saveReport(
+      xmlText,
+      poem,
+      model
+    );
 
     return NextResponse.json({ success: true, report: savedReport });
   } catch (error) {
