@@ -17,6 +17,8 @@ export const surfReportSchema = z.object({
   lastBuildDateObject: z.date(),
   discussion: z.array(z.string()),
   waveHeights: z.array(waveHeightSchema),
+  poem: z.array(z.string()),
+  model: z.string(),
 });
 
 // Types inferred from schemas

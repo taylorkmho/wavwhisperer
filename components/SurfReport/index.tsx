@@ -15,7 +15,6 @@ export default function SurfReport() {
     isLoading: reportLoading,
     error: reportError,
   } = useNoaaSurfReport();
-  const [currentPoem, setCurrentPoem] = useState<string[]>([]);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   if (reportLoading) {
     return (
@@ -55,12 +54,7 @@ export default function SurfReport() {
                 Rub the crystal ball
               </h1>
             </div>
-            <CrystalBall
-              poem={currentPoem}
-              discussion={report.discussion}
-              surfReportId={report.id}
-              onGenerate={setCurrentPoem}
-            />
+            <CrystalBall poem={report.poem} />
             <AnimatePresence>
               {isDropdownOpen && (
                 <motion.div
@@ -140,14 +134,6 @@ export default function SurfReport() {
               )}
             </AnimatePresence>
           </section>
-          {/* <section className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-12">
-            <div className="space-y-2 font-mono text-sm font-normal text-secondary-foreground">
-              {report.discussion.map((paragraph, index) => (
-                <p key={index}>{decode(paragraph)}</p>
-              ))}
-            </div>
-
-          </section> */}
         </>
       )}
     </div>

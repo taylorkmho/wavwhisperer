@@ -16,18 +16,10 @@ const FLOAT_SPEED = 0.25;
 const FLOAT_HEIGHT = 0.1;
 
 interface SceneProps {
-  discussion: string[];
-  surfReportId: string;
-  onGenerate: (poem: string[]) => void;
   poem?: string[];
 }
 
-const Scene: React.FC<SceneProps> = ({
-  discussion,
-  surfReportId,
-  onGenerate,
-  poem,
-}) => {
+const Scene: React.FC<SceneProps> = ({ poem }) => {
   const { size } = useThree();
   const mesh = useRef<THREE.Mesh>(null);
   const [thickness, setThickness] = useState(INITIAL_THICKNESS);
@@ -178,34 +170,10 @@ const Scene: React.FC<SceneProps> = ({
     }
   }, [mesh]);
 
-  const generateNewPoem = async () => {
-    try {
-      const response = await fetch("/api/generations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ discussion, surfReportId }),
-      });
-
-      if (!response.ok) throw new Error("Generation failed");
-
-      const generation = await response.json();
-      onGenerate(generation.poem);
-    } catch (error) {
-      console.error("Failed to generate poem:", error);
-    }
-  };
-
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     isPointerDown.current = true;
     holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
     setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
-
-    // Generate new poem when thickness reaches final value
-    if (thickness <= FINAL_THICKNESS + 0.01) {
-      generateNewPoem();
-    }
   };
 
   return (
@@ -264,20 +232,12 @@ const Scene: React.FC<SceneProps> = ({
 export const CrystalBall: React.FC<{
   className?: string;
   poem?: string[];
-  discussion: string[];
-  surfReportId: string;
-  onGenerate: (poem: string[]) => void;
-}> = ({ className, poem, discussion, surfReportId, onGenerate }) => {
+}> = ({ className, poem }) => {
   return (
     <Canvas className={cn("select-none", className)}>
       <directionalLight position={[10, 10, 10]} intensity={5} />
       <Environment preset="night" />
-      <Scene
-        poem={poem}
-        discussion={discussion}
-        surfReportId={surfReportId}
-        onGenerate={onGenerate}
-      />
+      <Scene poem={poem} />
     </Canvas>
   );
 };
