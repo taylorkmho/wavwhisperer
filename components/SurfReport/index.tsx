@@ -98,13 +98,13 @@ export default function SurfReport() {
                         width={30}
                         height={30}
                       />
-                      <h6 className="flex flex-col gap-0.5 leading-none">
+                      <h6 className="flex min-w-0 flex-col gap-0.5 leading-none">
                         <span className="text-muted-foreground">
                           Report data pulled from
                         </span>{" "}
                         <Link
                           href="https://www.weather.gov/hfo/SRF"
-                          className="font-bold decoration-foreground/50 underline-offset-2 hover:underline"
+                          className="truncate font-bold decoration-foreground/50 underline-offset-2 hover:underline"
                           target="_blank"
                         >
                           National Oceanic and Atmospheric Administration
