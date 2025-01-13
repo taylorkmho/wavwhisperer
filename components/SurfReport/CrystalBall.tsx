@@ -37,8 +37,8 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
 
   // Add push resistance calculation
   const pushResistance = useMemo(() => {
-    return size.width < 768 ? 0.2 : 0.1;
-  }, [size.width]);
+    return isMobile ? 0.2 : 0.1;
+  }, [isMobile]);
 
   // Add useEffect to set camera position only once on mount
   useEffect(() => {
@@ -47,15 +47,29 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
 
   // Use fixed size instead of viewport for scale calculation
   const scale = useMemo(() => {
-    const viewportScale = size.width / 280; // Start aggressive
-    const maxScale = size.width < 768 ? 3 : 2.2; // Lower max scale for desktop
-    const minInset = size.width < 768 ? 20 : 100; // Bigger inset on desktop
+    // Base scale calculations using both width and height
+    const widthScale = size.width / 280;
+    const heightScale = size.height / 280;
+    const baseScale = Math.min(widthScale, heightScale);
 
-    // Ensure minimum inset from edges
+    // Adjusted parameters for mobile vs desktop
+    const maxScale = 2.2; // Same for both
+    const minScale = isMobile ? 1.6 : 1.8;
+    const minInset = isMobile ? 40 : 100;
+
+    // Calculate scale with inset constraints
     const insetScale = (size.width - minInset * 2) / 280;
 
-    return Math.min(viewportScale, insetScale, maxScale);
-  }, [size.width]);
+    // Apply a multiplier to width-based scales to maintain roundness
+    const widthMultiplier = isMobile ? 1.2 : 1.0;
+    const adjustedInsetScale = insetScale * widthMultiplier;
+
+    // Return the constrained scale value
+    return Math.max(
+      minScale,
+      Math.min(baseScale * widthMultiplier, adjustedInsetScale, maxScale)
+    );
+  }, [size.width, size.height, isMobile]);
 
   useFrame(({ clock }) => {
     clockRef.current = clock;
