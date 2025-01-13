@@ -261,7 +261,7 @@ const Scene: React.FC<SceneProps> = ({
   );
 };
 
-export const CrystallBall: React.FC<{
+export const CrystalBall: React.FC<{
   className?: string;
   poem?: string[];
   discussion: string[];

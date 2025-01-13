@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { FaGithub } from "react-icons/fa6";
-import { CrystallBall } from "../CrystallBall";
+import { CrystalBall } from "./CrystalBall";
 import { WaveHeights } from "./WaveHeights";
 
 export default function SurfReport() {
@@ -54,7 +54,7 @@ export default function SurfReport() {
                 Rub the crystal ball
               </h1>
             </div>
-            <CrystallBall
+            <CrystalBall
               poem={currentPoem}
               discussion={report.discussion}
               surfReportId={report.id}
