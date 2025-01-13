@@ -1,12 +1,10 @@
 import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
-import { cn } from "@/lib/utils";
 import { decode } from "html-entities";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { FaGithub } from "react-icons/fa6";
+import { BottomNav } from "./BottomNav";
 import { CrystalBall } from "./CrystalBall";
-import { WaveHeights } from "./WaveHeights";
 
 export default function SurfReport() {
   const {
@@ -61,32 +59,7 @@ export default function SurfReport() {
               onGenerate={setCurrentPoem}
             />
             <div className="absolute inset-x-0 bottom-4 flex justify-center px-4">
-              <nav className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
-                <Link
-                  href="https://github.com/taylorkmho/wavewhisperer"
-                  target="_blank"
-                  className="shrink-0 pl-4 pr-2"
-                >
-                  <FaGithub className="size-4" />
-                </Link>
-                <div className="relative inline-flex grow overflow-x-auto">
-                  <div className="flex shrink-0 items-center gap-2 py-2 pl-4 pr-2">
-                    <WaveHeights waveHeights={report.waveHeights} />
-                  </div>
-                </div>
-                {["bg-gradient-to-r right-0", "bg-gradient-to-l left-10"].map(
-                  (classNames, i) => (
-                    <div
-                      className={cn(
-                        "absolute inset-y-0 z-20 h-full w-6",
-                        "from-secondary/0 to-secondary",
-                        classNames
-                      )}
-                      key={i}
-                    />
-                  )
-                )}
-              </nav>
+              <BottomNav waveHeights={report.waveHeights} />
             </div>
           </section>
           <section className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-12">
