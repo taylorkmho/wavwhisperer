@@ -18,7 +18,7 @@ interface WaveHeightsProps {
 
 export function WaveHeights({ waveHeights }: WaveHeightsProps) {
   return (
-    <div className="flex flex-wrap justify-center gap-4">
+    <div className="flex gap-4">
       {waveHeights.map((wave, index) => (
         <div
           key={index}

@@ -1,8 +1,10 @@
 import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
+import { cn } from "@/lib/utils";
 import { decode } from "html-entities";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { FaGithub } from "react-icons/fa6";
 import { CrystallBall } from "../CrystallBall";
 import { WaveHeights } from "./WaveHeights";
 
@@ -34,10 +36,10 @@ export default function SurfReport() {
     <div className="space-y-4">
       {report.discussion && report.discussion.length > 0 && (
         <>
-          <div className="relative h-[100vh]">
-            <div className="absolute inset-x-0 left-2 top-0 z-10 flex flex-col items-center gap-2 pt-2">
+          <section className="relative h-screen w-screen">
+            <div className="absolute inset-x-0 z-10 flex flex-col items-center gap-2 pt-2">
               {report.lastBuildDate && (
-                <p className="rounded-md border border-fuchsia-500/20 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 px-2 text-xs md:text-sm">
+                <p className="rounded-md border-2 border-fuchsia-500/20 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 px-2 text-xs md:text-sm">
                   Hawai‘i surf report{" "}
                   <strong>
                     {new Date(report.lastBuildDate).toLocaleString("en-US", {
@@ -48,11 +50,9 @@ export default function SurfReport() {
                   </strong>
                 </p>
               )}
-              <Typewriter
-                hideCursorOnComplete
-                text="Rub the crystal ball"
-                className="text-4xl md:text-7xl"
-              />
+              <h1 className="font-pixel text-5xl font-normal md:text-7xl">
+                Rub the crystal ball
+              </h1>
             </div>
             <CrystallBall
               poem={currentPoem}
@@ -60,11 +60,36 @@ export default function SurfReport() {
               surfReportId={report.id}
               onGenerate={setCurrentPoem}
             />
-            <div className="absolute inset-x-0 bottom-4">
-              <WaveHeights waveHeights={report.waveHeights} />
+            <div className="absolute inset-x-0 bottom-4 flex justify-center px-4">
+              <nav className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
+                <Link
+                  href="https://github.com/taylorkmho/wavewhisperer"
+                  target="_blank"
+                  className="shrink-0 pl-4 pr-2"
+                >
+                  <FaGithub className="size-4" />
+                </Link>
+                <div className="relative inline-flex grow overflow-x-auto">
+                  <div className="flex shrink-0 items-center gap-2 py-2 pl-4 pr-2">
+                    <WaveHeights waveHeights={report.waveHeights} />
+                  </div>
+                </div>
+                {["bg-gradient-to-r right-0", "bg-gradient-to-l left-10"].map(
+                  (classNames, i) => (
+                    <div
+                      className={cn(
+                        "absolute inset-y-0 z-20 h-full w-6",
+                        "from-secondary/0 to-secondary",
+                        classNames
+                      )}
+                      key={i}
+                    />
+                  )
+                )}
+              </nav>
             </div>
-          </div>
-          <div className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-12">
+          </section>
+          <section className="mx-auto w-full max-w-5xl space-y-4 px-4 pb-12">
             <div className="space-y-2 font-mono text-sm font-normal text-secondary-foreground">
               {report.discussion.map((paragraph, index) => (
                 <p key={index}>{decode(paragraph)}</p>
@@ -90,7 +115,7 @@ export default function SurfReport() {
                 </Link>
               </h6>
             </div>
-          </div>
+          </section>
         </>
       )}
     </div>
