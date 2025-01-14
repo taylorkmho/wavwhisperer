@@ -1,8 +1,9 @@
 "use client";
 
+import AnimatedPuns from "@/components/AnimatedPuns";
 import SurfReport from "@/components/SurfReport";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-
+import Link from "next/link";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -16,16 +17,22 @@ export default function Home() {
   return (
     <QueryClientProvider client={queryClient}>
       <main className="relative">
-        <h1 className="absolute left-2 top-2 z-10 max-w-96 text-6xl font-normal">
-          Peer into the crystal ball
-        </h1>
         <SurfReport />
 
-        <div className="absolute right-2 top-2 flex items-center gap-4 text-right">
-          <p className="w-full max-w-64 text-sm uppercase tracking-widest">
-            <strong className="block tracking-[0.5rem]">Know the future</strong>
-            (Get it, it’s a Surf forecast)
-          </p>
+        <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex w-full flex-wrap items-start justify-between gap-2 px-4">
+          <h1 className="max-w-96 text-6xl font-normal lg:max-w-xl lg:text-8xl">
+            Peer into the crystal ball
+          </h1>
+          <div className="flex flex-row-reverse items-start gap-2 text-left lg:flex-row lg:text-right">
+            <AnimatedPuns />
+            <Link
+              href="https://tellaho.com/?utm_source=wavewhisperer"
+              target="_blank"
+              className="flex shrink-0 items-center border border-[#f40c3f]/20 bg-black px-2 py-2.5 text-sm font-bold text-white"
+            >
+              /th
+            </Link>
+          </div>
         </div>
       </main>
     </QueryClientProvider>

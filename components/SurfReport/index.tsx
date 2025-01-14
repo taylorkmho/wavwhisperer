@@ -1,5 +1,4 @@
 import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
-import { cn } from "@/lib/utils";
 import { AnimatePresence, motion } from "framer-motion";
 import { decode } from "html-entities";
 import Image from "next/image";
@@ -54,24 +53,12 @@ export default function SurfReport() {
             exit={{ opacity: 0, y: 100 }}
             key="dropdown"
           >
-            <div className="relative mx-auto max-w-lg overflow-hidden rounded-xl bg-muted font-mono text-sm font-normal text-muted-foreground">
+            <div className="relative mx-auto max-w-lg overflow-hidden rounded-xl bg-black/70 font-mono text-sm font-normal text-muted-foreground backdrop-blur-lg">
               <div className="max-h-48 space-y-2 overflow-y-auto p-4">
                 {data.discussion.map((paragraph, index) => (
                   <p key={index}>{decode(paragraph)}</p>
                 ))}
               </div>
-              {["bg-gradient-to-t top-0", "bg-gradient-to-b bottom-0"].map(
-                (classNames, i) => (
-                  <div
-                    className={cn(
-                      "absolute inset-x-0 z-20 h-6",
-                      "from-muted/0 to-muted",
-                      classNames
-                    )}
-                    key={i}
-                  />
-                )
-              )}
             </div>
             <div className="inline-flex items-center gap-2 overflow-hidden rounded-full bg-secondary text-xs">
               <div className="flex grow items-center gap-2 py-1 pl-1">
@@ -112,6 +99,7 @@ export default function SurfReport() {
             key="bottom-nav"
           >
             <BottomNav
+              date={data.lastBuildDate}
               waveHeights={data.waveHeights}
               onClickDropdown={() => setIsDropdownOpen(!isDropdownOpen)}
             />
