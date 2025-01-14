@@ -1,26 +1,20 @@
 import { cn } from "@/lib/utils";
-import {
-  Environment,
-  MeshTransmissionMaterial,
-  Stars,
-  Text,
-} from "@react-three/drei";
+import { Environment, MeshTransmissionMaterial, Text } from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { WavyGrid } from "./WavyGrid";
 
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;
 const HOLD_DURATION_SECONDS = 2;
-const FLOAT_SPEED = 0.25;
-const FLOAT_HEIGHT = 0.1;
 
 interface SceneProps {
   poem?: string[];
 }
 
 const Scene: React.FC<SceneProps> = ({ poem }) => {
-  const { size } = useThree();
+  const { size, scene } = useThree();
   const mesh = useRef<THREE.Mesh>(null);
   const [thickness, setThickness] = useState(INITIAL_THICKNESS);
   const targetThickness = useRef(INITIAL_THICKNESS);
@@ -34,6 +28,8 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
   const lastPointerPosition = useRef<THREE.Vector2 | null>(null);
   const resistanceOffset = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
   const isMobile = useMemo(() => size.width < 768, [size.width]);
+  const currentBgColor = useRef(new THREE.Color("#000000"));
+  const targetBgColor = useRef(new THREE.Color("#000000"));
 
   // Add push resistance calculation
   const pushResistance = useMemo(() => {
@@ -71,19 +67,23 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
     );
   }, [size.width, size.height, isMobile]);
 
+  useEffect(() => {
+    scene.background = currentBgColor.current;
+  }, [scene]);
+
   useFrame(({ clock }) => {
     clockRef.current = clock;
     if (isPointerDown.current && holdStartTime.current !== null) {
       if (isMobile) {
-        // On mobile, immediately toggle to final thickness
         targetThickness.current =
           targetThickness.current === INITIAL_THICKNESS
             ? FINAL_THICKNESS
             : INITIAL_THICKNESS;
-        // Reset hold start time to prevent multiple toggles
+        targetBgColor.current = new THREE.Color(
+          targetThickness.current === FINAL_THICKNESS ? "#f40c3f" : "#000000"
+        );
         holdStartTime.current = null;
       } else {
-        // On desktop, keep the hold behavior
         const holdDuration = clock.getElapsedTime() - holdStartTime.current;
         const progress = Math.min(holdDuration / HOLD_DURATION_SECONDS, 1);
         targetThickness.current = THREE.MathUtils.lerp(
@@ -91,12 +91,23 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           FINAL_THICKNESS,
           progress
         );
+        if (progress === 1) {
+          targetBgColor.current = new THREE.Color("#f40c3f");
+        }
       }
     }
+
+    // Smooth color transition
+    currentBgColor.current.lerp(targetBgColor.current, 0.05);
 
     setThickness((current) =>
       THREE.MathUtils.lerp(current, targetThickness.current, 0.1)
     );
+
+    // Update the scene background directly
+    if (scene.background instanceof THREE.Color) {
+      scene.background.copy(currentBgColor.current);
+    }
   });
 
   useFrame((state) => {
@@ -115,21 +126,14 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
         resistanceOffset.current.lerp(targetOffset, 0.1);
         mesh.current.position.copy(resistanceOffset.current);
       } else {
-        // Only float if thickness is not at final value
-        if (thickness > FINAL_THICKNESS + 0.01) {
-          const time = state.clock.getElapsedTime();
-          const floatY = Math.sin(time * FLOAT_SPEED) * FLOAT_HEIGHT;
-          resistanceOffset.current.lerp(new THREE.Vector3(0, floatY, 0), 0.1);
-        } else {
-          // Return to center position when "tapped"
-          resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
-        }
+        // Return to center position when not being dragged
+        resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
         mesh.current.position.copy(resistanceOffset.current);
       }
 
-      mesh.current.rotation.x += 0.005;
+      mesh.current.rotation.x += 0.0025;
       mesh.current.rotation.y += 0.005;
-      mesh.current.rotation.z -= 0.005;
+      mesh.current.rotation.z -= 0.0025;
       // stop rotation if thickness is less than 0.026 and interpolate to the nearest multiple of 360
       if (thickness < FINAL_THICKNESS + 0.01) {
         mesh.current.rotation.y = THREE.MathUtils.lerp(
@@ -169,6 +173,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
       holdStartTime.current = null;
       if (targetThickness.current > FINAL_THICKNESS + 0.01) {
         targetThickness.current = INITIAL_THICKNESS;
+        targetBgColor.current = new THREE.Color("#000000");
       }
     };
 
@@ -192,15 +197,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
 
   return (
     <Suspense fallback={null}>
-      <Stars
-        radius={10}
-        depth={250}
-        count={1000}
-        factor={5}
-        saturation={0}
-        speed={0.5}
-        fade
-      />
+      <WavyGrid />
       <mesh
         ref={mesh}
         scale={scale}
@@ -220,7 +217,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
       >
         <sphereGeometry args={[1, 100, 100]} />
         <MeshTransmissionMaterial
-          transmission={1}
+          transmission={0.99}
           thickness={thickness}
           roughness={0.1}
           metalness={0}
