@@ -5,13 +5,33 @@ import { FaEllipsis, FaGithub } from "react-icons/fa6";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
+  date: string;
   waveHeights: WaveHeight[];
   onClickDropdown: () => void;
 }
 
-export function BottomNav({ waveHeights, onClickDropdown }: BottomNavProps) {
+export function BottomNav({
+  date,
+  waveHeights,
+  onClickDropdown,
+}: BottomNavProps) {
   return (
     <nav className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
+      {date && (
+        <div
+          className="flex h-full w-12 shrink-0 items-center justify-center bg-black/20 text-center text-xs font-bold text-white"
+          title={`Last updated: ${new Date(date).toLocaleDateString("en-US", {
+            month: "long",
+            day: "2-digit",
+            year: "numeric",
+          })}`}
+        >
+          {new Date(date).toLocaleDateString("en-US", {
+            month: "numeric",
+            day: "2-digit",
+          })}
+        </div>
+      )}
       <div className="relative inline-flex grow overflow-x-auto">
         <div className="flex shrink-0 items-center gap-2 py-2 pl-4 pr-2">
           <WaveHeights waveHeights={waveHeights} />
@@ -30,7 +50,7 @@ export function BottomNav({ waveHeights, onClickDropdown }: BottomNavProps) {
       >
         <FaEllipsis className="size-4" />
       </button>
-      {["bg-gradient-to-r right-16", "bg-gradient-to-l left-0"].map(
+      {["bg-gradient-to-r right-16", "bg-gradient-to-l left-12"].map(
         (classNames, i) => (
           <div
             className={cn(
