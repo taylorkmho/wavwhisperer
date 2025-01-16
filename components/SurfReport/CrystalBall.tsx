@@ -85,7 +85,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
             ? FINAL_THICKNESS
             : INITIAL_THICKNESS;
         targetBgColor.current = new THREE.Color(
-          targetThickness.current === FINAL_THICKNESS ? "#f40c3f" : "#000000"
+          targetThickness.current === FINAL_THICKNESS ? "#2C1DFF" : "#000000"
         );
         holdStartTime.current = null;
       } else {
@@ -97,7 +97,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           progress
         );
         if (progress === 1) {
-          targetBgColor.current = new THREE.Color("#f40c3f");
+          targetBgColor.current = new THREE.Color("#2C1DFF");
         }
       }
     }
@@ -234,28 +234,28 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           position={[0, 0, -0.25]}
           scale={0.5}
           form="ring"
-          color="#f40c3f"
+          color="#2C1DFF"
           intensity={1}
         />
         <Lightformer
           position={[0, 0, -0.5]}
           scale={0.75}
           form="ring"
-          color="#f40c3f"
+          color="#2C1DFF"
           intensity={1}
         />
         <Lightformer
           position={[0, 0, -0.125]}
           scale={0.25}
           form="ring"
-          color="#f40c3f"
+          color="#2C1DFF"
           intensity={1}
         />
         <Lightformer
           position={[0, 0, -0.0625]}
           scale={0.125}
           form="circle"
-          color="#f40c3f"
+          color="#2C1DFF"
           intensity={1}
         />
         <Text

@@ -11,7 +11,7 @@ export const WavyGrid = () => {
     () => ({
       uniforms: {
         uTime: { value: 0 },
-        uColor: { value: new THREE.Color("#f40c3f") },
+        uColor: { value: new THREE.Color("#2C1DFF") },
       },
       vertexShader: `
         varying vec2 vUv;
