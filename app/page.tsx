@@ -28,7 +28,7 @@ export default function Home() {
             <Link
               href="https://tellaho.com/?utm_source=wavewhisperer"
               target="_blank"
-              className="pointer-events-auto flex shrink-0 items-center border border-[#f40c3f]/20 bg-black px-2 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#f40c3f]"
+              className="pointer-events-auto flex shrink-0 items-center border border-[#2C1DFF]/20 bg-black px-2 py-2.5 text-sm font-bold text-white transition-colors hover:bg-[#2C1DFF]"
             >
               /th
             </Link>

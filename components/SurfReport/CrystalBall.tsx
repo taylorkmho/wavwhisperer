@@ -1,5 +1,10 @@
 import { cn } from "@/lib/utils";
-import { Environment, MeshTransmissionMaterial, Text } from "@react-three/drei";
+import {
+  Environment,
+  Lightformer,
+  MeshTransmissionMaterial,
+  Text,
+} from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
@@ -80,7 +85,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
             ? FINAL_THICKNESS
             : INITIAL_THICKNESS;
         targetBgColor.current = new THREE.Color(
-          targetThickness.current === FINAL_THICKNESS ? "#f40c3f" : "#000000"
+          targetThickness.current === FINAL_THICKNESS ? "#2C1DFF" : "#000000"
         );
         holdStartTime.current = null;
       } else {
@@ -92,7 +97,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           progress
         );
         if (progress === 1) {
-          targetBgColor.current = new THREE.Color("#f40c3f");
+          targetBgColor.current = new THREE.Color("#2C1DFF");
         }
       }
     }
@@ -224,6 +229,34 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           chromaticAberration={0.5}
           ior={1.4}
           backside={false}
+        />
+        <Lightformer
+          position={[0, 0, -0.25]}
+          scale={0.5}
+          form="ring"
+          color="#2C1DFF"
+          intensity={1}
+        />
+        <Lightformer
+          position={[0, 0, -0.5]}
+          scale={0.75}
+          form="ring"
+          color="#2C1DFF"
+          intensity={1}
+        />
+        <Lightformer
+          position={[0, 0, -0.125]}
+          scale={0.25}
+          form="ring"
+          color="#2C1DFF"
+          intensity={1}
+        />
+        <Lightformer
+          position={[0, 0, -0.0625]}
+          scale={0.125}
+          form="circle"
+          color="#2C1DFF"
+          intensity={1}
         />
         <Text
           position={[0, 0, 0]}
