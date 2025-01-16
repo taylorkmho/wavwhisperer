@@ -67,17 +67,15 @@ export default function AnimatedPuns() {
           initial={{
             y: height,
             opacity: 0.25,
-            rotateX: -45,
           }}
-          animate={{ y: 0, opacity: 1, rotateX: 0 }}
+          animate={{ y: 0, opacity: 1 }}
           exit={{
             y: -height,
             opacity: 0.25,
-            rotateX: 45,
             transformOrigin: "bottom",
           }}
           transition={{
-            duration: 2,
+            duration: 0.5,
             ease: "easeInOut",
           }}
           className="absolute w-full whitespace-nowrap tracking-widest"
