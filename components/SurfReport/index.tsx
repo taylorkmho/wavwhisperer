@@ -29,20 +29,6 @@ export default function SurfReport() {
 
   return (
     <section className="relative h-screen w-screen overflow-hidden">
-      {/* <div className="absolute right-2 top-2 z-10">
-        {data.lastBuildDate && (
-          <p className="rounded-md border-2 border-fuchsia-500/20 bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 px-2 text-xs md:text-sm">
-            Hawai‘i surf report{" "}
-            <strong>
-              {new Date(data.lastBuildDate).toLocaleString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </strong>
-          </p>
-        )}
-      </div> */}
       <CrystalBall poem={data.poem} />
       <AnimatePresence>
         {isDropdownOpen && (
