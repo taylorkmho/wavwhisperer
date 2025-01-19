@@ -30,6 +30,7 @@ export const withOpenAIErrorHandler = async <T>(
 export async function generateSurfLimerick(
   discussion: string[]
 ): Promise<{ poem: string[]; model: string }> {
+  const joinedDiscussion = discussion.join("\n");
   return withOpenAIErrorHandler(async () => {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
@@ -73,20 +74,20 @@ The final limerick should convey key forecast information within this strict for
         },
         {
           role: "user",
-          content: `The first of a series of large to extra large northwest swells is due this weekend. Long period forerunners are expected Saturday morning&#44; will build quickly down the island chain Saturday afternoon and peak Saturday night and early Sunday. Another round of large to extra large northwest swell is expected Monday through Thursday next week. Surf along east and south facing shores will remain small through the forecast period.`,
+          content: `The current long period northwest swell will slowly decline today. Surf heights along north and west facing shores will steadily decrease in line with this decreasing swell energy. The next northwest swell may produce advisory level surf along exposed north and west facing shores from Tuesday into Wednesday&#44; then slowly fade through the end of the week.",
+East facing shore surf will remain choppy the next few days as the trades build&#44; and background south swell will keep surf small on south facing shores through the coming week.`,
         },
         {
           role: "assistant",
-          content: `
-The long-period swells creep their way
-Through Saturday's dawn, they won't stay
-While east shores lie flat
-Next week brings more that
-A four-day XL wave buffet!`,
+          content: `The northwest swell’s fade starts today,
+As north and west walls slip away.
+With Tuesday’s next rise,
+Advisory size,
+Then small on the south, come what may!`,
         },
         {
           role: "user",
-          content: discussion.join("\n"),
+          content: joinedDiscussion,
         },
       ],
     });
