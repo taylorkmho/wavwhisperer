@@ -8,7 +8,9 @@ export class SurfReportClientService {
   static async getLatestReport(): Promise<SurfReportRecord | null> {
     const { data, error } = await supabase
       .from("surf_reports")
-      .select("id, last_build_date, discussion, wave_heights, poem, model")
+      .select(
+        "id, last_build_date, discussion, wave_heights, poem, model, audio_path"
+      )
       .order("created_at", { ascending: false })
       .limit(1)
       .single();
