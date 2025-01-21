@@ -12,7 +12,6 @@ import { WavyGrid } from "./WavyGrid";
 
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;
-const HOLD_DURATION_SECONDS = 2;
 
 interface SceneProps {
   poem?: string[];
@@ -79,27 +78,14 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
   useFrame(({ clock }) => {
     clockRef.current = clock;
     if (isPointerDown.current && holdStartTime.current !== null) {
-      if (isMobile) {
-        targetThickness.current =
-          targetThickness.current === INITIAL_THICKNESS
-            ? FINAL_THICKNESS
-            : INITIAL_THICKNESS;
-        targetBgColor.current = new THREE.Color(
-          targetThickness.current === FINAL_THICKNESS ? "#2C1DFF" : "#000000"
-        );
-        holdStartTime.current = null;
-      } else {
-        const holdDuration = clock.getElapsedTime() - holdStartTime.current;
-        const progress = Math.min(holdDuration / HOLD_DURATION_SECONDS, 1);
-        targetThickness.current = THREE.MathUtils.lerp(
-          INITIAL_THICKNESS,
-          FINAL_THICKNESS,
-          progress
-        );
-        if (progress === 1) {
-          targetBgColor.current = new THREE.Color("#2C1DFF");
-        }
-      }
+      targetThickness.current =
+        targetThickness.current === INITIAL_THICKNESS
+          ? FINAL_THICKNESS
+          : INITIAL_THICKNESS;
+      targetBgColor.current = new THREE.Color(
+        targetThickness.current === FINAL_THICKNESS ? "#2C1DFF" : "#000000"
+      );
+      holdStartTime.current = null;
     }
 
     // Smooth color transition
