@@ -18,6 +18,7 @@ export function useNoaaSurfReport() {
         waveHeights: report.wave_heights,
         poem: report.poem,
         model: report.model,
+        audioPath: report.audio_path,
       });
     },
   });

@@ -18,6 +18,7 @@ export const surfReportSchema = z.object({
   waveHeights: z.array(waveHeightSchema),
   poem: z.array(z.string()).optional(),
   model: z.string().optional(),
+  audioPath: z.string().optional(),
 });
 
 // Types inferred from schemas

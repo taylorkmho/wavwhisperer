@@ -1,25 +1,85 @@
 import { cn } from "@/lib/utils";
 import { WaveHeight } from "@/types/noaa";
 import Link from "next/link";
-import { FaEllipsis, FaGithub } from "react-icons/fa6";
+import { useRef, useState } from "react";
+import { FaEllipsis, FaGithub, FaPause, FaPlay } from "react-icons/fa6";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
   date: string;
   waveHeights: WaveHeight[];
   onClickDropdown: () => void;
+  audioFile?: string;
 }
 
 export function BottomNav({
   date,
   waveHeights,
   onClickDropdown,
+  audioFile,
 }: BottomNavProps) {
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioProgress, setAudioProgress] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const togglePlayback = () => {
+    if (!audioRef.current) return;
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleAudioEnd = () => {
+    setIsPlaying(false);
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+    }
+  };
+
+  const updateAudioProgress = () => {
+    if (audioRef.current) {
+      const progress = audioRef.current.currentTime / audioRef.current.duration;
+      setAudioProgress(progress);
+    }
+  };
+
   return (
     <nav className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
+      {audioFile && (
+        <>
+          <div
+            className="pointer-events-none absolute inset-0 z-50 bg-indigo-400/10 transition-transform duration-500 ease-linear"
+            style={{
+              transform: `scaleX(${audioProgress})`,
+              transformOrigin: "left",
+            }}
+          />
+          <button
+            onClick={togglePlayback}
+            className="group h-full shrink-0 bg-black/20 pl-4 pr-0"
+          >
+            {isPlaying ? (
+              <FaPause className="size-4 transition-transform group-hover:scale-125" />
+            ) : (
+              <FaPlay className="size-4 transition-transform group-hover:scale-125" />
+            )}
+          </button>
+          <audio
+            ref={audioRef}
+            className="invisible"
+            src={`https://mnegthmftttdlazyjbke.supabase.co/storage/v1/object/public/voiceover/${audioFile}`}
+            onEnded={handleAudioEnd}
+            onTimeUpdate={updateAudioProgress}
+          />
+        </>
+      )}
       {date && (
         <div
-          className="flex h-full w-12 shrink-0 items-center justify-center bg-black/20 text-center text-xs font-bold text-white"
+          className="flex h-full w-12 shrink-0 items-center justify-center bg-black/20 text-left text-xs font-bold text-white"
           title={`Last updated: ${new Date(date).toLocaleDateString("en-US", {
             month: "long",
             day: "2-digit",
@@ -50,7 +110,7 @@ export function BottomNav({
       >
         <FaEllipsis className="size-4" />
       </button>
-      {["bg-gradient-to-r right-16", "bg-gradient-to-l left-12"].map(
+      {["bg-gradient-to-r right-16", "bg-gradient-to-l left-20"].map(
         (classNames, i) => (
           <div
             className={cn(

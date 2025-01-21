@@ -1,3 +1,4 @@
+import { generateAudio } from "@/lib/elevenlabs/client";
 import { parseNoaaReport } from "@/lib/noaa/parser";
 import { generateSurfLimerick } from "@/lib/openai/client";
 import { SurfReportServerService } from "@/lib/services/surf-report.server";
@@ -42,21 +43,16 @@ export async function GET(request: Request) {
       model
     );
 
-    return NextResponse.json({ success: true, report: savedReport });
-  } catch (error) {
-    // Log the full error details
-    console.error("Failed to process surf report:", {
-      error,
-      message: error instanceof Error ? error.message : "Unknown error",
-      stack: error instanceof Error ? error.stack : undefined,
-    });
+    // Generate audio and upload to Supabase
+    console.log("Generating and uploading audio...");
+    const audioPath = await generateAudio(poem.join(" "), savedReport.id);
 
-    return NextResponse.json(
-      {
-        error: "Failed to process surf report",
-        details: error instanceof Error ? error.message : "Unknown error",
-      },
-      { status: 500 }
-    );
+    // Update the report with the audio path
+    await SurfReportServerService.updateAudioPath(savedReport.id, audioPath);
+
+    return NextResponse.json({ success: true, report: savedReport, audioPath });
+  } catch (error) {
+    console.error("Error in cron job:", error);
+    return new NextResponse("Internal Server Error", { status: 500 });
   }
 }

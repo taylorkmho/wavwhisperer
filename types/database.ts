@@ -13,6 +13,7 @@ export const surfReportRecordSchema = z.object({
   raw_xml: z.string().optional(),
   poem: z.array(z.string()),
   model: z.string(),
+  audio_path: z.string().nullable().optional(),
 });
 
 export type SurfReportRecord = z.infer<typeof surfReportRecordSchema>;
