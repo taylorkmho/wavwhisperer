@@ -34,4 +34,18 @@ export class SurfReportServerService {
 
     return surfReportRecordSchema.parse(data);
   }
+
+  static async updateAudioPath(
+    reportId: string,
+    audioPath: string
+  ): Promise<void> {
+    const { error } = await supabaseAdmin
+      .from("surf_reports")
+      .update({ audio_path: audioPath })
+      .eq("id", reportId);
+
+    if (error) {
+      throw new Error(`Failed to update audio path: ${error.message}`);
+    }
+  }
 }

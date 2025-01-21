@@ -40,6 +40,7 @@ Your limerick should establish dominant swell(s) direction (e.g. N, W, SW, etc.)
 It should also contrast with remaining, non-dominant swells/shores.
   `;
   const format = `
+The limerick should be exactly 5 lines long.
 The rhyme scheme is AABBA.
 Use metaphors and puns related to Hawaii's unique culture to make the limerick more engaging.
 Include day when available (e.g. "Saturday")
