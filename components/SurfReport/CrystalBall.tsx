@@ -8,6 +8,7 @@ import {
 import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import * as THREE from "three";
+import { useAudio } from "./AudioContext";
 import { WavyGrid } from "./WavyGrid";
 
 const INITIAL_THICKNESS = 4;
@@ -34,6 +35,8 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
   const isMobile = useMemo(() => size.width < 768, [size.width]);
   const currentBgColor = useRef(new THREE.Color("#000000"));
   const targetBgColor = useRef(new THREE.Color("#000000"));
+
+  const { play, pause } = useAudio();
 
   // Add push resistance calculation
   const pushResistance = useMemo(() => {
@@ -184,6 +187,11 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
     isPointerDown.current = true;
     holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
     setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
+    if (targetThickness.current === FINAL_THICKNESS) {
+      pause();
+    } else {
+      play();
+    }
   };
 
   return (
