@@ -1,8 +1,9 @@
 import { cn } from "@/lib/utils";
 import { WaveHeight } from "@/types/noaa";
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { FaEllipsis, FaGithub, FaPause, FaPlay } from "react-icons/fa6";
+import { useAudio } from "../AudioContext";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
@@ -18,23 +19,11 @@ export function BottomNav({
   onClickDropdown,
   audioFile,
 }: BottomNavProps) {
-  const [isPlaying, setIsPlaying] = useState(false);
+  const { isPlaying, play, pause, audioRef } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
-  const audioRef = useRef<HTMLAudioElement | null>(null);
-
-  const togglePlayback = () => {
-    if (!audioRef.current) return;
-
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
-    }
-    setIsPlaying(!isPlaying);
-  };
 
   const handleAudioEnd = () => {
-    setIsPlaying(false);
+    pause();
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
     }
@@ -59,7 +48,7 @@ export function BottomNav({
             }}
           />
           <button
-            onClick={togglePlayback}
+            onClick={isPlaying ? pause : play}
             className="group h-full shrink-0 bg-black/20 pl-4 pr-0"
           >
             {isPlaying ? (
