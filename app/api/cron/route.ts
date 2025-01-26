@@ -1,6 +1,7 @@
 import { generateAudio } from "@/lib/elevenlabs/client";
 import { parseNoaaReport } from "@/lib/noaa/parser";
-import { generateSurfLimerick } from "@/lib/openai/client";
+import { generateSurfLimerick } from "@/lib/openai/generateSurfLimerick";
+
 import { SurfReportServerService } from "@/lib/services/surf-report.server";
 import { NextResponse } from "next/server";
 
