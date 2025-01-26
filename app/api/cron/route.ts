@@ -1,10 +1,10 @@
 import { generateAudio } from "@/lib/elevenlabs/client";
+import { fetchNoaaReport } from "@/lib/noaa/client";
 import { parseNoaaReport } from "@/lib/noaa/parser";
-import { generateSurfLimerick } from "@/lib/openai/client";
+import { generateSurfLimerick } from "@/lib/openai/generateSurfLimerick";
+
 import { SurfReportServerService } from "@/lib/services/surf-report.server";
 import { NextResponse } from "next/server";
-
-const NOAA_URL = "https://www.weather.gov/source/hfo/xml/SurfState.xml";
 
 export async function GET(request: Request) {
   try {
@@ -20,18 +20,10 @@ export async function GET(request: Request) {
 
     // Fetch new data
     console.log("Fetching from NOAA...");
-    const response = await fetch(NOAA_URL);
-    if (!response.ok) {
-      throw new Error(
-        `NOAA fetch failed: ${response.status} ${response.statusText}`
-      );
-    }
-
-    const xmlText = await response.text();
-    console.log("Received XML length:", xmlText.length);
-
-    // Parse report and generate limerick
+    const xmlText = await fetchNoaaReport();
     const parsedReport = parseNoaaReport(xmlText);
+
+    // Generate limerick
     console.log("Generating limerick...");
     const { poem, model } = await generateSurfLimerick(parsedReport.discussion);
 
