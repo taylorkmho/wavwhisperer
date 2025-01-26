@@ -4,10 +4,10 @@ Wave Whisperer is a Next.js application that forecasts surf conditions by fetchi
 
 ## Features
 
-- **Daily Surf Data**: Fetches and parses surf data from NOAA's XML feed.
-- **Limerick Generation**: Uses OpenAI to create surf-themed limericks based on NOAA discussions. Implements the persona-instruction-context prompting pattern, inspired by Chapter 6 of "Hands-on Large Language Models" (Alammar & Grootendorst).
-- **Audio Narration**: Converts limericks into audio using ElevenLabs and stores them in Supabase.
-- **Interactive 3D UI**: Features a physics-based crystal ball using Three.js, React Three Fiber, and Framer Motion for fluid animations and interactions. Includes real-time mesh deformation, dynamic lighting, and audio playback controls.
+- **Daily Surf Data**: Fetches and parses surf data from NOAA's XML feed. [`noaa/client`](/lib/noaa/client.ts)
+- **Limerick Generation**: Uses OpenAI to create surf-themed limericks based on NOAA discussions. Implements the persona-instruction-context prompting pattern, inspired by Chapter 6 of "Hands-on Large Language Models" (Alammar & Grootendorst). [`openai/client`](/lib/openai/client.ts) [`openai/generateSurfLimerick`](/lib/openai/generateSurfLimerick.ts)
+- **Audio Narration**: Converts limericks into audio using ElevenLabs and stores them in Supabase. [`elevenlabs/client`](/lib/elevenlabs/client.ts)
+- **Interactive 3D UI**: Features a physics-based crystal ball using Three.js, React Three Fiber, and Framer Motion for fluid animations and interactions. Includes real-time mesh deformation, dynamic lighting, and audio playback controls. [`CrystalBall`](/components/SurfReport/CrystalBall.tsx) [`WavyGrid`](/components/SurfReport/WavyGrid.tsx) [`AudioContext`](/components/SurfReport/AudioContext.tsx)
 
 ```mermaid
 sequenceDiagram
