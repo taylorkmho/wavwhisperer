@@ -1,4 +1,4 @@
-# Wave Whisperer
+# <img src="https://github.com/user-attachments/assets/d7da8f57-0df0-4a06-bfb7-9b889dfa4f3c" width="28" />&nbsp;&nbsp;Wave Whisperer
 
 Wave Whisperer is a Next.js application that forecasts surf conditions by fetching data from NOAA, generating surf-themed limericks using OpenAI, and creating audio narrations with ElevenLabs. This project serves as an exploration of OpenAI's API capabilities, particularly focusing on multi-shot prompting techniques to generate context-aware, metered poetry from structured forecast data.
 
