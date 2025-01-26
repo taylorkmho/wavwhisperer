@@ -30,9 +30,8 @@ sequenceDiagram
 
 ## Features
 
-- **Real-time Surf Data**: Fetches and parses surf data from NOAA's XML feed.
-- **Limerick Generation**: Uses OpenAI to create surf-themed limericks based on NOAA discussions.
-- **Prompting technique**: Implements the persona-instruction-context prompting pattern, inspired by Chapter 6 of "Hands-on Large Language Models" (Alammar & Grootendorst).
+- **Daily Surf Data**: Fetches and parses surf data from NOAA's XML feed.
+- **Limerick Generation**: Uses OpenAI to create surf-themed limericks based on NOAA discussions. Implements the persona-instruction-context prompting pattern, inspired by Chapter 6 of "Hands-on Large Language Models" (Alammar & Grootendorst).
 - **Audio Narration**: Converts limericks into audio using ElevenLabs and stores them in Supabase.
 - **Interactive 3D UI**: Features a physics-based crystal ball using Three.js, React Three Fiber, and Framer Motion for fluid animations and interactions. Includes real-time mesh deformation, dynamic lighting, and audio playback controls.
 
