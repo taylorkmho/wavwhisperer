@@ -87,7 +87,7 @@ export function BottomNav({
         </div>
       </div>
       <Link
-        href="https://github.com/taylorkmho/wavewhisperer"
+        href="https://github.com/taylorkmho/wavwhisperer"
         target="_blank"
         className="group shrink-0 rounded-full border-2 border-transparent p-1 hover:border-fuchsia-400/20 hover:bg-gradient-to-br hover:from-fuchsia-400/30 hover:to-indigo-400/30"
       >
