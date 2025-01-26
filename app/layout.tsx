@@ -3,7 +3,7 @@ import type { Metadata } from "next/types";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Wave Whisperer",
+  title: "Wav Whisperer",
   description: "Forecasting the future surf",
 };
 

@@ -3,12 +3,16 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 const puns = [
   <>
+    <p>the WAV</p>
+    <p>WHISPERER</p>
+  </>,
+  <>
     <p>Sea the future</p>
     <p>Wave to tomorrow</p>
   </>,
   <>
     <p>Deep learning, deeper water</p>
-    <p>Large wave model</p>
+    <p>Large wave modeling</p>
   </>,
   <>
     <p>SURF-GPT (GNARLY PREDICTION</p>
@@ -19,12 +23,8 @@ const puns = [
     <p>PROPHECY WITH A PORPOISE</p>
   </>,
   <>
+    <p>CMD+SEA, CMD+V</p>
     <p>FINE-TUNING THE PIPELINE</p>
-    <p>THE WAVE WHISPERER</p>
-  </>,
-  <>
-    <p>CTRL+SEA</p>
-    <p>SEAMANTIC SEARCH</p>
   </>,
 ];
 
