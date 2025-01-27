@@ -2,7 +2,7 @@ import { useFrame } from "@react-three/fiber";
 import { useMemo, useRef } from "react";
 import * as THREE from "three";
 
-export const WavyGrid = () => {
+export const WavyGrid = ({ animate = true }: { animate?: boolean }) => {
   const meshRef = useRef<THREE.Mesh>(null);
   const materialRef = useRef<THREE.ShaderMaterial>(null);
 
@@ -12,10 +12,12 @@ export const WavyGrid = () => {
       uniforms: {
         uTime: { value: 0 },
         uColor: { value: new THREE.Color("#2C1DFF") },
+        uAnimate: { value: animate ? 1.0 : 0.0 },
       },
       vertexShader: `
         varying vec2 vUv;
         uniform float uTime;
+        uniform float uAnimate;
         
         void main() {
           vUv = uv;
@@ -24,17 +26,20 @@ export const WavyGrid = () => {
           vec2 center = vec2(0.5, 0.5);
           float dist = distance(vUv, center);
           
-          // Create 10-second cycle
-          float cycle = mod(uTime, 10.0);
-          
-          // Create single pulse wave effect
-          float ringPosition = cycle * 0.05;
-          float ringWidth = 0.02;
-          float wave = exp(-pow((dist - ringPosition) / ringWidth, 2.0));
-          
-          // Fade wave amplitude based on cycle for perfect loop
-          float amplitude = sin(cycle * 0.628318) * 0.5;
-          wave *= amplitude;
+          float wave = 0.0;
+          if (uAnimate > 0.0) {
+            // Create 10-second cycle
+            float cycle = mod(uTime, 10.0);
+            
+            // Create single pulse wave effect
+            float ringPosition = cycle * 0.05;
+            float ringWidth = 0.02;
+            wave = exp(-pow((dist - ringPosition) / ringWidth, 2.0));
+            
+            // Fade wave amplitude based on cycle for perfect loop
+            float amplitude = sin(cycle * 0.628318) * 0.5;
+            wave *= amplitude;
+          }
           
           // Apply wave to position
           vec3 pos = position;

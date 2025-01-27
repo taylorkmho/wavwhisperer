@@ -177,7 +177,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
 
   return (
     <Suspense fallback={null}>
-      <WavyGrid />
+      <WavyGrid animate={!isMobile} />
       <mesh
         ref={mesh}
         scale={scale}
