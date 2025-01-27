@@ -1,4 +1,5 @@
 import { cn } from "@/lib/utils";
+
 import {
   Environment,
   Lightformer,
@@ -6,7 +7,14 @@ import {
   Text,
 } from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
-import { Suspense, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import * as THREE from "three";
 import { useAudio } from "./AudioContext";
 import { WavyGrid } from "./WavyGrid";
@@ -21,154 +29,133 @@ interface SceneProps {
 const Scene: React.FC<SceneProps> = ({ poem }) => {
   const { size, scene } = useThree();
   const mesh = useRef<THREE.Mesh>(null);
-  const [thickness, setThickness] = useState(INITIAL_THICKNESS);
-  const targetThickness = useRef(INITIAL_THICKNESS);
+  const [isRevealed, setIsRevealed] = useState(false);
   const isPointerDown = useRef(false);
-  const holdStartTime = useRef<number | null>(null);
-  const clockRef = useRef<THREE.Clock | undefined>(undefined);
   const { camera } = useThree();
   const [pointerPosition, setPointerPosition] = useState<THREE.Vector2 | null>(
     null
   );
-  const lastPointerPosition = useRef<THREE.Vector2 | null>(null);
   const resistanceOffset = useRef<THREE.Vector3>(new THREE.Vector3(0, 0, 0));
+  const targetBgColor = useRef<THREE.Color>(new THREE.Color("#000000"));
+  const currentBgColor = useRef<THREE.Color>(new THREE.Color("#000000"));
+  const [targetThickness, setTargetThickness] = useState(INITIAL_THICKNESS);
   const isMobile = useMemo(() => size.width < 768, [size.width]);
-  const currentBgColor = useRef(new THREE.Color("#000000"));
-  const targetBgColor = useRef(new THREE.Color("#000000"));
 
-  const { play, pause } = useAudio();
+  const { play, pause, isPlaying } = useAudio();
+
+  const handleReveal = useCallback(() => {
+    play();
+    setTargetThickness(FINAL_THICKNESS);
+    targetBgColor.current = new THREE.Color("#2C1DFF");
+    setIsRevealed(true);
+  }, [play]);
+
+  const handleUnreveal = useCallback(() => {
+    pause();
+    setTargetThickness(INITIAL_THICKNESS);
+    targetBgColor.current = new THREE.Color("#000000");
+    setIsRevealed(false);
+  }, [pause]);
 
   // Add push resistance calculation
   const pushResistance = useMemo(() => {
     return isMobile ? 0.2 : 0.1;
   }, [isMobile]);
 
-  // Add useEffect to set camera position only once on mount
-  useEffect(() => {
-    camera.position.set(0, 0, 4);
-  }, [camera]);
-
-  // Use fixed size instead of viewport for scale calculation
+  // Calculate scale based on screen size
   const scale = useMemo(() => {
-    // Base scale calculations using both width and height
     const widthScale = size.width / 280;
     const heightScale = size.height / 280;
     const baseScale = Math.min(widthScale, heightScale);
 
-    // Adjusted parameters for mobile vs desktop
-    const maxScale = 2.2; // Same for both
+    const maxScale = 2.2;
     const minScale = isMobile ? 1.6 : 1.8;
     const minInset = isMobile ? 40 : 100;
 
-    // Calculate scale with inset constraints
     const insetScale = (size.width - minInset * 2) / 280;
 
-    // Apply a multiplier to width-based scales to maintain roundness
     const widthMultiplier = isMobile ? 1.2 : 1.0;
     const adjustedInsetScale = insetScale * widthMultiplier;
 
-    // Return the constrained scale value
     return Math.max(
       minScale,
       Math.min(baseScale * widthMultiplier, adjustedInsetScale, maxScale)
     );
   }, [size.width, size.height, isMobile]);
 
+  // Add useEffect to set camera position only once on mount
   useEffect(() => {
-    scene.background = currentBgColor.current;
-  }, [scene]);
-
-  useFrame(({ clock }) => {
-    clockRef.current = clock;
-    if (isPointerDown.current && holdStartTime.current !== null) {
-      targetThickness.current =
-        targetThickness.current === INITIAL_THICKNESS
-          ? FINAL_THICKNESS
-          : INITIAL_THICKNESS;
-      targetBgColor.current = new THREE.Color(
-        targetThickness.current === FINAL_THICKNESS ? "#2C1DFF" : "#000000"
-      );
-      holdStartTime.current = null;
-    }
-
-    // Smooth color transition
-    currentBgColor.current.lerp(targetBgColor.current, 0.05);
-
-    setThickness((current) =>
-      THREE.MathUtils.lerp(current, targetThickness.current, 0.1)
-    );
-
-    // Update the scene background directly
-    if (scene.background instanceof THREE.Color) {
-      scene.background.copy(currentBgColor.current);
-    }
-  });
+    camera.position.set(0, 0, 4);
+  }, [camera]);
 
   useFrame((state) => {
-    if (mesh.current) {
-      if (isPointerDown.current && pointerPosition) {
-        // Replace mouse.x/y with pointer.x/y
-        const pointer = state.pointer;
-        // Calculate resistance effect
-        const targetOffset = new THREE.Vector3(
-          (pointer.x - pointerPosition.x) * pushResistance,
-          (pointer.y - pointerPosition.y) * pushResistance,
-          -pushResistance // Update z-axis movement
-        );
+    if (!mesh.current) return;
 
-        // Apply spring-like behavior
-        resistanceOffset.current.lerp(targetOffset, 0.1);
-        mesh.current.position.copy(resistanceOffset.current);
-      } else {
-        // Return to center position when not being dragged
-        resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
-        mesh.current.position.copy(resistanceOffset.current);
-      }
+    // Smoothly transition background color
+    currentBgColor.current.lerp(targetBgColor.current, 0.05);
+    scene.background = currentBgColor.current;
 
+    // Add resistance effect
+    if (isPointerDown.current && pointerPosition) {
+      const pointer = state.pointer;
+
+      const targetOffset = new THREE.Vector3(
+        (pointer.x - pointerPosition.x) * pushResistance,
+        (pointer.y - pointerPosition.y) * pushResistance,
+        -pushResistance
+      );
+
+      resistanceOffset.current.lerp(targetOffset, 0.1);
+      mesh.current.position.copy(resistanceOffset.current);
+    } else {
+      resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
+      mesh.current.position.copy(resistanceOffset.current);
+    }
+
+    // Rotate the ball
+    if (isRevealed) {
+      mesh.current.rotation.y = THREE.MathUtils.lerp(
+        mesh.current.rotation.y,
+        THREE.MathUtils.degToRad(
+          Math.round(THREE.MathUtils.radToDeg(mesh.current.rotation.y) / 360) *
+            360
+        ),
+        0.1
+      );
+      mesh.current.rotation.x = THREE.MathUtils.lerp(
+        mesh.current.rotation.x,
+        THREE.MathUtils.degToRad(
+          Math.round(THREE.MathUtils.radToDeg(mesh.current.rotation.x) / 360) *
+            360
+        ),
+        0.1
+      );
+      mesh.current.rotation.z = THREE.MathUtils.lerp(
+        mesh.current.rotation.z,
+        THREE.MathUtils.degToRad(
+          Math.round(THREE.MathUtils.radToDeg(mesh.current.rotation.z) / 360) *
+            360
+        ),
+        0.1
+      );
+    } else {
       mesh.current.rotation.x += 0.0025;
       mesh.current.rotation.y += 0.005;
       mesh.current.rotation.z -= 0.0025;
-      // stop rotation if thickness is less than 0.026 and interpolate to the nearest multiple of 360
-      if (thickness < FINAL_THICKNESS + 0.01) {
-        mesh.current.rotation.y = THREE.MathUtils.lerp(
-          mesh.current.rotation.y,
-          THREE.MathUtils.degToRad(
-            Math.round(
-              THREE.MathUtils.radToDeg(mesh.current.rotation.y) / 360
-            ) * 360
-          ),
-          0.1
-        );
-        mesh.current.rotation.x = THREE.MathUtils.lerp(
-          mesh.current.rotation.x,
-          THREE.MathUtils.degToRad(
-            Math.round(
-              THREE.MathUtils.radToDeg(mesh.current.rotation.x) / 360
-            ) * 360
-          ),
-          0.1
-        );
-        mesh.current.rotation.z = THREE.MathUtils.lerp(
-          mesh.current.rotation.z,
-          THREE.MathUtils.degToRad(
-            Math.round(
-              THREE.MathUtils.radToDeg(mesh.current.rotation.z) / 360
-            ) * 360
-          ),
-          0.1
-        );
-      }
     }
   });
+
+  useEffect(() => {
+    if (isPlaying) {
+      handleReveal();
+    } else {
+      handleUnreveal();
+    }
+  }, [isPlaying, handleReveal, handleUnreveal]);
 
   useEffect(() => {
     const handlePointerUp = () => {
       isPointerDown.current = false;
-      holdStartTime.current = null;
-      if (targetThickness.current > FINAL_THICKNESS + 0.01) {
-        targetThickness.current = INITIAL_THICKNESS;
-        targetBgColor.current = new THREE.Color("#000000");
-      }
     };
 
     window.addEventListener("pointerup", handlePointerUp);
@@ -177,33 +164,26 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
     };
   }, []);
 
-  useEffect(() => {
-    if (mesh.current) {
-      mesh.current.position.set(0, 0, 0);
-    }
-  }, [mesh]);
-
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
     isPointerDown.current = true;
-    holdStartTime.current = clockRef.current?.getElapsedTime() ?? 0;
     setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
-    if (targetThickness.current === FINAL_THICKNESS) {
-      pause();
+
+    if (isRevealed) {
+      handleUnreveal();
     } else {
-      play();
+      handleReveal();
     }
   };
 
   return (
     <Suspense fallback={null}>
-      <WavyGrid />
+      <WavyGrid animate={!isMobile} />
       <mesh
         ref={mesh}
         scale={scale}
         onPointerDown={handlePointerDown}
         onPointerMove={(e) => {
           if (isPointerDown.current) {
-            lastPointerPosition.current = pointerPosition;
             setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
           }
         }}
@@ -217,41 +197,28 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
         <sphereGeometry args={[1, 100, 100]} />
         <MeshTransmissionMaterial
           transmission={0.99}
-          thickness={thickness}
+          thickness={targetThickness}
           roughness={0.1}
           metalness={0}
           chromaticAberration={0.5}
           ior={1.4}
           backside={false}
         />
-        <Lightformer
-          position={[0, 0, -0.25]}
-          scale={0.5}
-          form="ring"
-          color="#2C1DFF"
-          intensity={1}
-        />
-        <Lightformer
-          position={[0, 0, -0.5]}
-          scale={0.75}
-          form="ring"
-          color="#2C1DFF"
-          intensity={1}
-        />
-        <Lightformer
-          position={[0, 0, -0.125]}
-          scale={0.25}
-          form="ring"
-          color="#2C1DFF"
-          intensity={1}
-        />
-        <Lightformer
-          position={[0, 0, -0.0625]}
-          scale={0.125}
-          form="circle"
-          color="#2C1DFF"
-          intensity={1}
-        />
+        {[
+          { position: -0.25, scale: 0.5, form: "ring" },
+          { position: -0.5, scale: 0.75, form: "ring" },
+          { position: -0.125, scale: 0.25, form: "ring" },
+          { position: -0.0625, scale: 0.125, form: "circle" },
+        ].map((light, index) => (
+          <Lightformer
+            key={index}
+            position={[0, 0, light.position]}
+            scale={light.scale}
+            form={light.form}
+            color="#2C1DFF"
+            intensity={1}
+          />
+        ))}
         <Text
           position={[0, 0, 0]}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"

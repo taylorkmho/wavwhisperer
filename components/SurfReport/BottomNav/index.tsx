@@ -1,8 +1,9 @@
 import { cn } from "@/lib/utils";
 import { WaveHeight } from "@/types/noaa";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaEllipsis, FaGithub, FaPause, FaPlay } from "react-icons/fa6";
+import { toast } from "sonner";
 import { useAudio } from "../AudioContext";
 import { WaveHeights } from "./WaveHeights";
 
@@ -21,6 +22,25 @@ export function BottomNav({
 }: BottomNavProps) {
   const { isPlaying, play, pause, audioRef } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
+
+  useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      if (!audioFile) return;
+      if (event.key === " " || event.key.toLowerCase() === "k") {
+        event.preventDefault();
+        if (isPlaying) {
+          toast("YOU FOUND THE SECRET KEY!");
+          pause();
+        } else {
+          toast("SECRET KEY!");
+          play();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyPress);
+    return () => window.removeEventListener("keydown", handleKeyPress);
+  }, [isPlaying, play, pause, audioFile]);
 
   const handleAudioEnd = () => {
     pause();
@@ -41,7 +61,7 @@ export function BottomNav({
       {audioFile && (
         <>
           <div
-            className="pointer-events-none absolute inset-0 z-50 bg-indigo-400/10 transition-transform duration-500 ease-linear"
+            className="pointer-events-none absolute inset-0 z-50 bg-emerald-400/10 transition-transform duration-500 ease-linear"
             style={{
               transform: `scaleX(${audioProgress})`,
               transformOrigin: "left",
