@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/sonner";
 import { fontPixel, fontSans, fontSerif } from "@/lib/fonts";
 import type { Metadata } from "next/types";
 import "./globals.css";
@@ -29,6 +30,7 @@ export default function RootLayout({
         className={`${fontSans.variable} ${fontSerif.variable} ${fontPixel.variable} ${fontSans.className} dark antialiased`}
       >
         {children}
+        <Toaster />
       </body>
     </html>
   );
