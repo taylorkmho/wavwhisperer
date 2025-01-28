@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import { WaveHeight } from "@/types/noaa";
+import { usePlausible } from "next-plausible";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FaEllipsis, FaGithub, FaPause, FaPlay } from "react-icons/fa6";
@@ -14,6 +15,12 @@ interface BottomNavProps {
   audioFile?: string;
 }
 
+const formatTimeStamp = (timeInSeconds: number) => {
+  const minutes = Math.floor(timeInSeconds / 60);
+  const seconds = String(Math.floor(timeInSeconds % 60)).padStart(2, "0");
+  return `${minutes}:${seconds}`;
+};
+
 export function BottomNav({
   date,
   waveHeights,
@@ -22,6 +29,7 @@ export function BottomNav({
 }: BottomNavProps) {
   const { isPlaying, play, pause, audioRef } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
+  const plausible = usePlausible();
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -29,10 +37,10 @@ export function BottomNav({
       if (event.key === " " || event.key.toLowerCase() === "k") {
         event.preventDefault();
         if (isPlaying) {
-          toast("YOU FOUND THE SECRET KEY!");
+          toast("such clairvoyance");
           pause();
         } else {
-          toast("SECRET KEY!");
+          toast("so wow");
           play();
         }
       }
@@ -43,9 +51,18 @@ export function BottomNav({
   }, [isPlaying, play, pause, audioFile]);
 
   const handleAudioEnd = () => {
+    plausible(`Audio completed (${audioFile})`);
     pause();
     if (audioRef.current) {
       audioRef.current.currentTime = 0;
+    }
+  };
+
+  const handleAudioStart = () => {
+    if (audioRef.current) {
+      plausible(
+        `Audio started${audioRef.current.currentTime >= 1 ? ` ${formatTimeStamp(audioRef.current.currentTime)}` : ""} (${audioFile})`
+      );
     }
   };
 
@@ -82,6 +99,7 @@ export function BottomNav({
             className="invisible"
             src={`https://mnegthmftttdlazyjbke.supabase.co/storage/v1/object/public/voiceover/${audioFile}`}
             onEnded={handleAudioEnd}
+            onPlay={handleAudioStart}
             onTimeUpdate={updateAudioProgress}
           />
         </>
