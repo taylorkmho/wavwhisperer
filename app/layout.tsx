@@ -1,5 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { fontPixel, fontSans, fontSerif } from "@/lib/fonts";
+import PlausibleProvider from "next-plausible";
 import type { Metadata } from "next/types";
 import "./globals.css";
 
@@ -29,8 +30,10 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontPixel.variable} ${fontSans.className} dark antialiased`}
       >
-        {children}
-        <Toaster />
+        <PlausibleProvider domain="tellaho.com">
+          {children}
+          <Toaster />
+        </PlausibleProvider>
       </body>
     </html>
   );
