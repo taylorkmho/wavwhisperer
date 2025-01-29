@@ -27,7 +27,7 @@ export function BottomNav({
   onClickDropdown,
   audioFile,
 }: BottomNavProps) {
-  const { isPlaying, play, pause, audioRef } = useAudio();
+  const { isPlaying, play, pause, audioRef, error, setError } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
   const plausible = usePlausible();
 
@@ -75,7 +75,7 @@ export function BottomNav({
 
   return (
     <nav className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
-      {audioFile && (
+      {audioFile && !error && (
         <>
           <div
             className="pointer-events-none absolute inset-0 z-50 bg-emerald-400/10 transition-transform duration-500 ease-linear"
@@ -101,6 +101,7 @@ export function BottomNav({
             onEnded={handleAudioEnd}
             onPlay={handleAudioStart}
             onTimeUpdate={updateAudioProgress}
+            onError={() => setError(true)}
           />
         </>
       )}

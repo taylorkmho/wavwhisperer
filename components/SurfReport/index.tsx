@@ -20,7 +20,7 @@ export default function SurfReport() {
   }
 
   if (error) {
-    return <div>Error loading data: {error.message}</div>;
+    console.error(error);
   }
 
   if (!data) {

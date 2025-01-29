@@ -5,6 +5,8 @@ interface AudioContextType {
   play: () => void;
   pause: () => void;
   audioRef: React.RefObject<HTMLAudioElement | null>;
+  error: boolean;
+  setError: (error: boolean) => void;
 }
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
@@ -13,11 +15,16 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
+  const [error, setError] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const play = () => {
-    if (audioRef.current && !isPlaying) {
-      audioRef.current.play();
+    if (audioRef.current && !isPlaying && !error) {
+      audioRef.current.play().catch((err) => {
+        console.error("Error playing audio:", err);
+        setError(true);
+        setIsPlaying(false);
+      });
       setIsPlaying(true);
     }
   };
@@ -30,7 +37,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AudioContext.Provider value={{ isPlaying, play, pause, audioRef }}>
+    <AudioContext.Provider
+      value={{ isPlaying, play, pause, audioRef, error, setError }}
+    >
       {children}
     </AudioContext.Provider>
   );
