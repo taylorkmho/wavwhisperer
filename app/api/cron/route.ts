@@ -1,7 +1,7 @@
+import { generateSurfLimerick } from "@/lib/anthropic/generateSurfLimerick";
 import { generateAudio } from "@/lib/elevenlabs/client";
 import { fetchNoaaReport } from "@/lib/noaa/client";
 import { parseNoaaReport } from "@/lib/noaa/parser";
-import { generateSurfLimerick } from "@/lib/openai/generateSurfLimerick";
 
 import { SurfReportServerService } from "@/lib/services/surf-report.server";
 import { NextResponse } from "next/server";
