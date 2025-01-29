@@ -1,11 +1,11 @@
 # <img src="https://github.com/user-attachments/assets/d7da8f57-0df0-4a06-bfb7-9b889dfa4f3c" width="28" />&nbsp;&nbsp;Wave Whisperer
 
-Wave Whisperer is a Next.js application that forecasts surf conditions by fetching data from NOAA, generating surf-themed limericks using OpenAI, and creating audio narrations with ElevenLabs. This project serves as an exploration of OpenAI's API capabilities, particularly focusing on multi-shot prompting techniques to generate context-aware, metered poetry from structured forecast data.
+Wave Whisperer is a Next.js application that forecasts surf conditions by fetching data from NOAA, generating surf-themed limericks using Anthropic, and creating audio narrations with ElevenLabs. This project serves as an exploration of Anthropic's API capabilities, particularly focusing on multi-shot prompting techniques to generate context-aware, metered poetry from structured forecast data.
 
 ## Features
 
 - **Daily Surf Data**: Fetches and parses surf data from NOAA's XML feed. [`noaa/client`](/lib/noaa/client.ts)
-- **Limerick Generation**: Uses OpenAI to create surf-themed limericks based on NOAA discussions. Implements the persona-instruction-context prompting pattern, inspired by Chapter 6 of "Hands-on Large Language Models" (Alammar & Grootendorst). [`openai/client`](/lib/openai/client.ts) [`openai/generateSurfLimerick`](/lib/openai/generateSurfLimerick.ts)
+- **Limerick Generation**: Uses Anthropic's Claude to create surf-themed limericks based on NOAA discussions. Implements the persona-instruction-context prompting pattern, inspired by Chapter 6 of "Hands-on Large Language Models" (Alammar & Grootendorst). [`anthropic/client`](/lib/anthropic/client.ts) [`anthropic/generateSurfLimerick`](/lib/anthropic/generateSurfLimerick.ts)
 - **Audio Narration**: Converts limericks into audio using ElevenLabs and stores them in Supabase. [`elevenlabs/client`](/lib/elevenlabs/client.ts)
 - **Interactive 3D UI**: Features a physics-based crystal ball using Three.js, React Three Fiber, and Framer Motion for fluid animations and interactions. Includes real-time mesh deformation, dynamic lighting, and audio playback controls. [`CrystalBall`](/components/SurfReport/CrystalBall.tsx) [`WavyGrid`](/components/SurfReport/WavyGrid.tsx) [`AudioContext`](/components/SurfReport/AudioContext.tsx)
 
@@ -14,7 +14,7 @@ sequenceDiagram
     participant Cron as Vercel Cron
     participant NOAA as NOAA XML Feed
     participant Backend as Wave Whisperer API
-    participant OpenAI as OpenAI API
+    participant Anthropic as Anthropic API
     participant ElevenLabs as ElevenLabs API
     participant Supabase as Supabase
     participant Frontend as Wave Whisperer UI
@@ -23,8 +23,8 @@ sequenceDiagram
     Backend->>NOAA: Fetch surf data
     NOAA-->>Backend: Return XML feed
     Backend->>Backend: Parse surf data
-    Backend->>OpenAI: Generate limerick
-    OpenAI-->>Backend: Return limerick
+    Backend->>Anthropic: Generate limerick
+    Anthropic-->>Backend: Return limerick
     Backend->>Supabase: Store initial data
     Supabase-->>Backend: Return report ID
     Backend->>ElevenLabs: Convert to speech
@@ -62,7 +62,7 @@ Create a `.env` file in the root directory of the project. This file will store 
 
 - `CRON_SECRET`: Used to authenticate cron jobs for scheduled tasks.
 - `ELEVENLABS_API_KEY`: API key for ElevenLabs to generate audio narrations.
-- `OPENAI_API_KEY` and `OPENAI_ORG_ID`: Credentials for accessing OpenAI's API to generate limericks.
+- `ANTHROPIC_API_KEY`: API key for Anthropic's Claude to generate limericks.
 - `SUPABASE_SERVICE_ROLE_KEY`: Service role key for Supabase, used for server-side operations requiring elevated permissions.
 - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public credentials for accessing Supabase, used for client-side operations.
 
