@@ -1,7 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { useVotes } from "@/hooks/useVotes";
-
-import { FaThumbsDown, FaThumbsUp } from "react-icons/fa6";
+import { FaThumbsUp } from "react-icons/fa6";
 import { toast } from "sonner";
 
 interface VoteButtonsProps {
@@ -9,17 +8,12 @@ interface VoteButtonsProps {
 }
 
 export function VoteButtons({ surfReportId }: VoteButtonsProps) {
-  const { voteCounts, castVote, userVote } = useVotes(surfReportId);
+  const { voteCounts, castVote } = useVotes(surfReportId);
 
-  const handleVote = async (type: "up" | "down") => {
-    if (type === userVote) {
-      toast.error("You already voted for this report!");
-      return;
-    }
-
+  const handleVote = async () => {
     try {
-      await castVote(type);
-      toast(`Vote ${type === "up" ? "up" : "down"} recorded!`);
+      await castVote();
+      toast("Vote recorded!");
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message);
@@ -28,25 +22,14 @@ export function VoteButtons({ surfReportId }: VoteButtonsProps) {
   };
 
   return (
-    <div className="flex items-center gap-2">
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => handleVote("up")}
-        className="flex items-center gap-2"
-      >
-        <FaThumbsUp />
-        <span>{voteCounts.upvotes}</span>
-      </Button>
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => handleVote("down")}
-        className="flex items-center gap-2"
-      >
-        <FaThumbsDown />
-        <span>{voteCounts.downvotes}</span>
-      </Button>
-    </div>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={handleVote}
+      className="flex items-center gap-2"
+    >
+      <FaThumbsUp />
+      <span>{voteCounts.upvotes}</span>
+    </Button>
   );
 }

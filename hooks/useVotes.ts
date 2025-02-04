@@ -7,7 +7,6 @@ export function useVotes(surfReportId: string) {
   const queryClient = useQueryClient();
   const [voteCounts, setVoteCounts] = useState<VoteCounts>({
     upvotes: 0,
-    downvotes: 0,
   });
 
   // Query to fetch initial vote counts
@@ -28,8 +27,7 @@ export function useVotes(surfReportId: string) {
   useEffect(() => {
     if (initialVotes) {
       const ups = initialVotes.filter((v) => v.vote_type === "up").length;
-      const downs = initialVotes.filter((v) => v.vote_type === "down").length;
-      setVoteCounts({ upvotes: ups, downvotes: downs });
+      setVoteCounts({ upvotes: ups });
     }
   }, [initialVotes]);
 
@@ -47,13 +45,23 @@ export function useVotes(surfReportId: string) {
           table: "votes",
           filter: `surf_report_id=eq.${surfReportId}`,
         },
-        (_payload) => {
-          console.log("Realtime vote update received:", _payload);
-          queryClient.invalidateQueries({ queryKey: ["votes", surfReportId] });
+        (payload) => {
+          console.log("Realtime vote update received:", {
+            eventType: payload.eventType,
+            new: payload.new,
+            old: payload.old,
+            table: payload.table,
+          });
+
+          queryClient.invalidateQueries({
+            queryKey: ["votes", surfReportId],
+            exact: true,
+            refetchType: "active",
+          });
         }
       )
       .subscribe((status) => {
-        console.log(`Subscription status:`, status);
+        console.log(`Subscription status for ${surfReportId}:`, status);
       });
 
     return () => {
@@ -64,13 +72,12 @@ export function useVotes(surfReportId: string) {
     };
   }, [surfReportId, queryClient]);
 
-  // Function to cast a vote
-  const castVote = async (type: "up" | "down") => {
-    console.log(`Attempting to cast ${type} vote for report ${surfReportId}`);
+  const castVote = async () => {
+    console.log(`Casting upvote for report ${surfReportId}`);
 
     const { error } = await supabase.from("votes").insert({
       surf_report_id: surfReportId,
-      vote_type: type,
+      vote_type: "up",
     });
 
     if (error) {
