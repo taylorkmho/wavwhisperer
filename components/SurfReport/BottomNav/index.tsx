@@ -27,7 +27,7 @@ export function BottomNav({ data }: BottomNavProps) {
   const plausible = usePlausible();
   const { isPlaying, play, pause, audioRef } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(true);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { lastBuildDate, waveHeights, audioPath, id } = data;
 
   useEffect(() => {
@@ -101,7 +101,7 @@ export function BottomNav({ data }: BottomNavProps) {
               </div>
             </div>
             <div className="inline-flex items-center gap-2 overflow-hidden rounded-full bg-secondary text-xs">
-              <div className="flex min-w-0 grow items-center gap-2 py-1 pl-1">
+              <div className="flex grow items-center gap-2 py-1 pl-1">
                 <Image
                   src="/noaa_digital_logo.svg"
                   alt="NOAA"
@@ -173,7 +173,7 @@ export function BottomNav({ data }: BottomNavProps) {
                 >
                   {new Date(lastBuildDate).toLocaleDateString("en-US", {
                     month: "numeric",
-                    day: "2-digit",
+                    day: "numeric",
                   })}
                 </div>
               )}
