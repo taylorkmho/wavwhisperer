@@ -153,13 +153,16 @@ export function BottomNav({ data }: BottomNavProps) {
                     className="group h-full shrink-0 bg-black/20 pl-4 pr-0"
                   >
                     {isPlaying ? (
-                      <FaPause className="size-4 transition-transform group-hover:scale-125" />
+                      <FaPause className="size-4 transition-transform group-hover:scale-125 group-active:scale-100" />
                     ) : (
-                      <FaPlay className="size-4 transition-transform group-hover:scale-125" />
+                      <FaPlay className="size-4 transition-transform group-hover:scale-125 group-active:scale-100" />
                     )}
                   </button>
                 </>
               )}
+              <div className="flex h-full items-center bg-black/20">
+                <VoteButtons surfReportId={id} />
+              </div>
               {lastBuildDate && (
                 <div
                   className="flex h-full w-12 shrink-0 items-center justify-center bg-black/20 text-left text-xs font-bold text-white"
@@ -183,13 +186,12 @@ export function BottomNav({ data }: BottomNavProps) {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                <VoteButtons surfReportId={id} />
                 <Link
                   href="https://github.com/taylorkmho/wavwhisperer"
                   target="_blank"
                   className="group shrink-0 rounded-full border-2 border-transparent p-1 hover:border-fuchsia-400/20 hover:bg-gradient-to-br hover:from-fuchsia-400/30 hover:to-indigo-400/30"
                 >
-                  <FaGithub className="size-4 transition-transform group-hover:scale-125" />
+                  <FaGithub className="size-4 transition-transform group-hover:scale-125 group-active:scale-100" />
                 </Link>
               </div>
               <button
