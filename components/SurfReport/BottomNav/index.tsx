@@ -200,7 +200,7 @@ export function BottomNav({ data }: BottomNavProps) {
               >
                 <FaEllipsis className="size-4" />
               </button>
-              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-20"].map(
+              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-28"].map(
                 (classNames, i) => (
                   <div
                     className={cn(
