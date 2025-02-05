@@ -12,7 +12,6 @@ export function useNoaaSurfReport() {
       }
 
       return surfReportSchema.parse({
-        id: report.id,
         lastBuildDate: report.last_build_date,
         lastBuildDateObject: new Date(report.last_build_date),
         discussion: report.discussion,

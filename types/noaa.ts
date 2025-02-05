@@ -12,7 +12,6 @@ export const waveHeightSchema = z.object({
 
 // Surf Report Schema
 export const surfReportSchema = z.object({
-  id: z.string(),
   lastBuildDate: z.string(),
   lastBuildDateObject: z.date(),
   discussion: z.array(z.string()),
