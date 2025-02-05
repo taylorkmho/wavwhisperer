@@ -10,7 +10,6 @@ import { FaEllipsis, FaGithub, FaPause, FaPlay } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
 import { toast } from "sonner";
 import { useAudio } from "../AudioContext";
-import { VoteButtons } from "../VoteButtons";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
@@ -28,7 +27,7 @@ export function BottomNav({ data }: BottomNavProps) {
   const { isPlaying, play, pause, audioRef } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { lastBuildDate, waveHeights, audioPath, id } = data;
+  const { lastBuildDate, waveHeights, audioPath } = data;
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -160,9 +159,6 @@ export function BottomNav({ data }: BottomNavProps) {
                   </button>
                 </>
               )}
-              <div className="flex h-full items-center bg-black/20">
-                <VoteButtons surfReportId={id} />
-              </div>
               {lastBuildDate && (
                 <div
                   className="flex h-full w-12 shrink-0 items-center justify-center bg-black/20 text-left text-xs font-bold text-white"
@@ -200,7 +196,7 @@ export function BottomNav({ data }: BottomNavProps) {
               >
                 <FaEllipsis className="size-4" />
               </button>
-              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-28"].map(
+              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-20"].map(
                 (classNames, i) => (
                   <div
                     className={cn(
