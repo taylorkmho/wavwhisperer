@@ -22,7 +22,7 @@ export async function generateAudio(
   text: string,
   reportId: string
 ): Promise<string> {
-  const defaultVoiceId = "N2lVS1w4EtoT3dr4eOWO"; // Set your default voice ID here
+  const defaultVoiceId = "GBv7mTt0atIp3Br8iCZE"; // Set your default voice ID here
 
   try {
     console.log("Generating audio with text:", text); // Log the text
