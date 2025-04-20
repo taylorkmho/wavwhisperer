@@ -13,7 +13,7 @@ import { useAudio } from "../AudioContext";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
-  data: SurfReport;
+  currentSurfReport: SurfReport;
 }
 
 const formatTimeStamp = (timeInSeconds: number) => {
@@ -22,12 +22,12 @@ const formatTimeStamp = (timeInSeconds: number) => {
   return `${minutes}:${seconds}`;
 };
 
-export function BottomNav({ data }: BottomNavProps) {
+export function BottomNav({ currentSurfReport }: BottomNavProps) {
   const plausible = usePlausible();
   const { isPlaying, play, pause, audioRef } = useAudio();
   const [audioProgress, setAudioProgress] = useState(0);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { lastBuildDate, waveHeights, audioPath } = data;
+  const { waveHeights, audioPath } = currentSurfReport;
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -94,7 +94,7 @@ export function BottomNav({ data }: BottomNavProps) {
           >
             <div className="relative mx-auto max-w-lg overflow-hidden rounded-xl bg-black/70 font-mono text-sm font-normal text-muted-foreground backdrop-blur-lg">
               <div className="max-h-48 space-y-2 overflow-y-auto p-4">
-                {data.discussion.map((paragraph, index) => (
+                {currentSurfReport.discussion.map((paragraph, index) => (
                   <p key={index}>{decode(paragraph)}</p>
                 ))}
               </div>
@@ -159,23 +159,6 @@ export function BottomNav({ data }: BottomNavProps) {
                   </button>
                 </>
               )}
-              {lastBuildDate && (
-                <div
-                  className="flex h-full w-12 shrink-0 items-center justify-center bg-black/20 text-left text-xs font-bold text-white"
-                  title={`Last updated: ${new Date(
-                    lastBuildDate
-                  ).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}`}
-                >
-                  {new Date(lastBuildDate).toLocaleDateString("en-US", {
-                    month: "numeric",
-                    day: "numeric",
-                  })}
-                </div>
-              )}
               <div className="relative inline-flex grow overflow-x-auto">
                 <div className="flex shrink-0 items-center gap-2 py-2 pl-4 pr-2">
                   <WaveHeights waveHeights={waveHeights} />
@@ -196,7 +179,7 @@ export function BottomNav({ data }: BottomNavProps) {
               >
                 <FaEllipsis className="size-4" />
               </button>
-              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-20"].map(
+              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-0"].map(
                 (classNames, i) => (
                   <div
                     className={cn(

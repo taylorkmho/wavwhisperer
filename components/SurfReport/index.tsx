@@ -33,7 +33,7 @@ export default function SurfReport() {
   return (
     <section className="relative h-screen w-screen overflow-hidden">
       <CrystalBall poem={data.poem} />
-      <BottomNav data={data} />
+      <BottomNav currentSurfReport={data} />
     </section>
   );
 }

@@ -9,7 +9,6 @@ import { CurrentReportProvider } from "@/components/SurfReport/CurrentReportCont
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Link from "next/link";
 import { useState } from "react";
-import { FaArrowLeft } from "react-icons/fa6";
 
 const queryClient = new QueryClient();
 
@@ -23,33 +22,26 @@ export default function Home() {
           <main className="relative">
             <SurfReport />
 
-            <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex w-full flex-wrap items-start justify-between gap-2 px-4">
-              <div className="max-w-96 lg:max-w-xl">
-                <h1 className="text-6xl font-normal lg:text-8xl">
-                  Peer into the crystal ball
-                </h1>
-                <div className="flex flex-row items-center gap-2">
-                  <button
-                    className="border-brand hover:border-brand/80 group pointer-events-auto flex size-12 shrink-0 items-center justify-center rounded-full border-2 bg-black p-2"
-                    onClick={() => setShowRecentReports(true)}
-                    title="Recent Surf Reports"
-                    aria-label="Recent Surf Reports"
+            <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex w-full px-4">
+              <div className="order-2 flex justify-between gap-2 lg:flex-row">
+                <div className="flex items-start gap-2 text-right">
+                  <AnimatedPuns />
+                  <Link
+                    href="https://tellaho.com/?utm_source=wavewhisperer"
+                    target="_blank"
+                    className="border-brand/20 hover:bg-brand pointer-events-auto flex shrink-0 items-center border bg-black px-2 py-2.5 text-sm font-bold text-white transition-colors"
                   >
-                    <FaArrowLeft className="size-full group-hover:scale-105 group-active:scale-95" />
-                    <span className="sr-only">Recent Surf Reports</span>
-                  </button>
-                  <CurrentReportDisplay />
+                    /th
+                  </Link>
                 </div>
               </div>
-              <div className="flex flex-row-reverse items-start gap-2 text-left lg:flex-row lg:text-right">
-                <AnimatedPuns />
-                <Link
-                  href="https://tellaho.com/?utm_source=wavewhisperer"
-                  target="_blank"
-                  className="border-brand/20 hover:bg-brand pointer-events-auto flex shrink-0 items-center border bg-black px-2 py-2.5 text-sm font-bold text-white transition-colors"
-                >
-                  /th
-                </Link>
+              <div className="order-1 flex grow flex-col gap-4">
+                <h1 className="max-w-96 text-6xl font-normal lg:max-w-xl lg:text-8xl">
+                  Peer into the crystal ball
+                </h1>
+                <CurrentReportDisplay
+                  onShowRecentReports={() => setShowRecentReports(true)}
+                />
               </div>
             </div>
 
