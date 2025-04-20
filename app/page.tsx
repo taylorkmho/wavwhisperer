@@ -1,12 +1,12 @@
 "use client";
 
 import { Providers } from "@/components/Providers";
-import { SurfReportPage } from "@/components/SurfReportPage";
+import { SurfReport } from "@/components/SurfReport";
 
 export default function Home() {
   return (
     <Providers>
-      <SurfReportPage />
+      <SurfReport />
     </Providers>
   );
 }
