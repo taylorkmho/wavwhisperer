@@ -1,9 +1,19 @@
 import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
+import { useEffect } from "react";
 import { BottomNav } from "./BottomNav";
 import { CrystalBall } from "./CrystalBall";
+import { useCurrentReport } from "./CurrentReportContext";
 
 export default function SurfReport() {
+  const { setCurrentReport } = useCurrentReport();
   const { data, isLoading, error } = useNoaaSurfReport();
+
+  useEffect(() => {
+    if (data) {
+      setCurrentReport(data);
+    }
+  }, [data, setCurrentReport]);
+
   if (isLoading) {
     return (
       <div className="flex h-screen w-screen items-center justify-center">
