@@ -20,7 +20,7 @@ export function RecentReports() {
       {reports.map((report) => (
         <div
           key={report.id}
-          className="rounded-lg border border-[#2C1DFF]/20 bg-black p-4 text-white"
+          className="border-brand/20 rounded-lg border bg-black p-4 text-white"
         >
           <div className="text-sm font-bold">
             {new Date(report.last_build_date).toLocaleDateString()}
