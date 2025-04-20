@@ -1,5 +1,6 @@
 import { SurfReportClientService } from "@/lib/services/surf-report.client";
 import { useQuery } from "@tanstack/react-query";
+import Link from "next/link";
 
 export function RecentReports() {
   const { data: reports, isLoading } = useQuery({
@@ -18,15 +19,16 @@ export function RecentReports() {
   return (
     <div className="space-y-4">
       {reports.map((report) => (
-        <div
+        <Link
           key={report.id}
+          href={`/report/${report.id}`}
           className="border-brand/20 rounded-lg border bg-black p-4 text-white"
         >
           <div className="text-sm font-bold">
             {new Date(report.last_build_date).toLocaleDateString()}
           </div>
           <div className="mt-2 text-sm">{report.poem}</div>
-        </div>
+        </Link>
       ))}
     </div>
   );

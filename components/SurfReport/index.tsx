@@ -1,14 +1,20 @@
-import { useNoaaSurfReport } from "@/hooks/useNoaaSurfReport";
+"use client";
+
+import { useSurfReport } from "@/hooks/useSurfReport";
 import { useEffect } from "react";
 import { useAudio } from "./AudioContext";
 import { BottomNav } from "./BottomNav";
 import { CrystalBall } from "./CrystalBall";
 import { useCurrentReport } from "./CurrentReportContext";
 
-export default function SurfReport() {
+interface SurfReportProps {
+  id?: string;
+}
+
+export function SurfReport({ id }: SurfReportProps) {
   const { setCurrentReport } = useCurrentReport();
   const { setAudioPath } = useAudio();
-  const { data, isLoading, error } = useNoaaSurfReport();
+  const { data, isLoading, error } = useSurfReport(id);
 
   useEffect(() => {
     if (data) {

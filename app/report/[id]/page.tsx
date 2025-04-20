@@ -3,10 +3,10 @@
 import { Providers } from "@/components/Providers";
 import { SurfReportPage } from "@/components/SurfReportPage";
 
-export default function Home() {
+export default function ReportPage({ params }: { params: { id: string } }) {
   return (
     <Providers>
-      <SurfReportPage />
+      <SurfReportPage id={params.id} />
     </Providers>
   );
 }
