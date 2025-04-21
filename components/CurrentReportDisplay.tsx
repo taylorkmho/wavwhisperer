@@ -114,7 +114,9 @@ export function CurrentReportDisplay() {
             <div
               className={cn(
                 "absolute inset-x-2 inset-y-0 -z-10 rounded-full bg-[length:200%_100%] blur-lg",
-                "animate-shimmer via-brand from-brand/0 to-brand/0 bg-gradient-to-r from-10% via-30% to-90%"
+                "animate-shimmer via-brand from-brand/0 to-brand/0 bg-gradient-to-r from-10% via-30% to-90%",
+                isPlaying &&
+                  "from-fuchsia-500/0 via-fuchsia-500 to-fuchsia-500/0"
               )}
             />
           </motion.button>
