@@ -22,7 +22,21 @@ export function RecentReports() {
   }
 
   const isActive = (reportId: string) => {
-    return pathname === `/report/${reportId}`;
+    // If the report is the current report, return true
+    if (pathname === `/report/${reportId}`) {
+      return true;
+    }
+    // If no report is selected and this is the first report, return true
+    if (
+      !pathname.startsWith("/report/") &&
+      reports &&
+      reports.length > 0 &&
+      reports[0].id === reportId
+    ) {
+      return true;
+    }
+    // Otherwise, return false
+    return false;
   };
 
   return (
