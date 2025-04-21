@@ -1,6 +1,4 @@
-import { Toaster } from "@/components/ui/sonner";
 import { fontPixel, fontSans, fontSerif } from "@/lib/fonts";
-import PlausibleProvider from "next-plausible";
 import type { Metadata } from "next/types";
 import "./globals.css";
 
@@ -11,9 +9,9 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en">
       <head>
@@ -30,10 +28,7 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontSerif.variable} ${fontPixel.variable} ${fontSans.className} dark antialiased`}
       >
-        <PlausibleProvider domain="tellaho.com">
-          {children}
-          <Toaster />
-        </PlausibleProvider>
+        <main className="relative">{children}</main>
       </body>
     </html>
   );

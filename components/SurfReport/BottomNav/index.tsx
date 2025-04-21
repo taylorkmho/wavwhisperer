@@ -2,87 +2,23 @@ import { cn } from "@/lib/utils";
 import { SurfReport } from "@/types/noaa";
 import { AnimatePresence, motion } from "framer-motion";
 import { decode } from "html-entities";
-import { usePlausible } from "next-plausible";
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { FaEllipsis, FaGithub, FaPause, FaPlay } from "react-icons/fa6";
+import { useState } from "react";
+import { FaEllipsis, FaGithub } from "react-icons/fa6";
 import { IoClose } from "react-icons/io5";
-import { toast } from "sonner";
-import { useAudio } from "../AudioContext";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
-  data: SurfReport;
+  currentSurfReport: SurfReport;
 }
 
-const formatTimeStamp = (timeInSeconds: number) => {
-  const minutes = Math.floor(timeInSeconds / 60);
-  const seconds = String(Math.floor(timeInSeconds % 60)).padStart(2, "0");
-  return `${minutes}:${seconds}`;
-};
-
-export function BottomNav({ data }: BottomNavProps) {
-  const plausible = usePlausible();
-  const { isPlaying, play, pause, audioRef } = useAudio();
-  const [audioProgress, setAudioProgress] = useState(0);
+export function BottomNav({ currentSurfReport }: BottomNavProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { lastBuildDate, waveHeights, audioPath } = data;
-
-  useEffect(() => {
-    const handleKeyPress = (event: KeyboardEvent) => {
-      if (!audioPath) return;
-      if (event.key === " " || event.key.toLowerCase() === "k") {
-        event.preventDefault();
-        if (isPlaying) {
-          toast("such clairvoyance");
-          pause();
-        } else {
-          toast("so wow");
-          play();
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyPress);
-    return () => window.removeEventListener("keydown", handleKeyPress);
-  }, [isPlaying, play, pause, audioPath]);
-
-  const handleAudioEnd = () => {
-    plausible(`Audio completed (${audioPath})`);
-    pause();
-    if (audioRef.current) {
-      audioRef.current.currentTime = 0;
-    }
-  };
-
-  const handleAudioStart = () => {
-    if (audioRef.current) {
-      plausible(
-        `Audio started${audioRef.current.currentTime >= 1 ? ` ${formatTimeStamp(audioRef.current.currentTime)}` : ""} (${audioPath})`
-      );
-    }
-  };
-
-  const updateAudioProgress = () => {
-    if (audioRef.current) {
-      const progress = audioRef.current.currentTime / audioRef.current.duration;
-      setAudioProgress(progress);
-    }
-  };
+  const { waveHeights } = currentSurfReport;
 
   return (
     <nav>
-      {audioPath && (
-        <audio
-          ref={audioRef}
-          className="invisible"
-          src={`https://mnegthmftttdlazyjbke.supabase.co/storage/v1/object/public/voiceover/${audioPath}`}
-          onEnded={handleAudioEnd}
-          onPlay={handleAudioStart}
-          onTimeUpdate={updateAudioProgress}
-        />
-      )}
       <AnimatePresence>
         {isDropdownOpen && (
           <motion.div
@@ -94,7 +30,7 @@ export function BottomNav({ data }: BottomNavProps) {
           >
             <div className="relative mx-auto max-w-lg overflow-hidden rounded-xl bg-black/70 font-mono text-sm font-normal text-muted-foreground backdrop-blur-lg">
               <div className="max-h-48 space-y-2 overflow-y-auto p-4">
-                {data.discussion.map((paragraph, index) => (
+                {currentSurfReport.discussion.map((paragraph, index) => (
                   <p key={index}>{decode(paragraph)}</p>
                 ))}
               </div>
@@ -138,44 +74,6 @@ export function BottomNav({ data }: BottomNavProps) {
             key="bottom-nav"
           >
             <div className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
-              {audioPath && (
-                <>
-                  <div
-                    className="pointer-events-none absolute inset-0 z-50 bg-emerald-400/10 transition-transform duration-500 ease-linear"
-                    style={{
-                      transform: `scaleX(${audioProgress})`,
-                      transformOrigin: "left",
-                    }}
-                  />
-                  <button
-                    onClick={isPlaying ? pause : play}
-                    className="group h-full shrink-0 bg-black/20 pl-4 pr-0"
-                  >
-                    {isPlaying ? (
-                      <FaPause className="size-4 transition-transform group-hover:scale-125 group-active:scale-100" />
-                    ) : (
-                      <FaPlay className="size-4 transition-transform group-hover:scale-125 group-active:scale-100" />
-                    )}
-                  </button>
-                </>
-              )}
-              {lastBuildDate && (
-                <div
-                  className="flex h-full w-12 shrink-0 items-center justify-center bg-black/20 text-left text-xs font-bold text-white"
-                  title={`Last updated: ${new Date(
-                    lastBuildDate
-                  ).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "2-digit",
-                    year: "numeric",
-                  })}`}
-                >
-                  {new Date(lastBuildDate).toLocaleDateString("en-US", {
-                    month: "numeric",
-                    day: "numeric",
-                  })}
-                </div>
-              )}
               <div className="relative inline-flex grow overflow-x-auto">
                 <div className="flex shrink-0 items-center gap-2 py-2 pl-4 pr-2">
                   <WaveHeights waveHeights={waveHeights} />
@@ -196,7 +94,7 @@ export function BottomNav({ data }: BottomNavProps) {
               >
                 <FaEllipsis className="size-4" />
               </button>
-              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-20"].map(
+              {["bg-gradient-to-r right-16", "bg-gradient-to-l left-0"].map(
                 (classNames, i) => (
                   <div
                     className={cn(
