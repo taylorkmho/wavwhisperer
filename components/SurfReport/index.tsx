@@ -60,7 +60,7 @@ export function SurfReport({ id }: SurfReportProps) {
             </Link>
           </div>
         </div>
-        <div className="order-1 flex grow flex-col gap-4">
+        <div className="order-2 flex grow flex-col gap-4 md:order-1">
           <h1 className="max-w-96 text-6xl font-normal lg:max-w-xl lg:text-8xl">
             Peer into the crystal ball
           </h1>
