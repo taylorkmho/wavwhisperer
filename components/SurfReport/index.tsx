@@ -47,9 +47,9 @@ export function SurfReport({ id }: SurfReportProps) {
       <CrystalBall poem={data.poem} />
       <BottomNav currentSurfReport={data} />
 
-      <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex w-full px-4">
-        <div className="order-2 flex justify-between gap-2 lg:flex-row">
-          <div className="flex items-start gap-2 text-right">
+      <div className="pointer-events-none absolute inset-x-0 top-2 z-10 flex w-full flex-col gap-4 border-2 border-violet-600 px-4 md:flex-row">
+        <div className="order-2 flex justify-between gap-2 border-2 border-orange-600 lg:flex-row">
+          <div className="flex flex-row-reverse items-start gap-2 px-2 md:flex-row md:px-0 md:text-right">
             <AnimatedPuns />
             <Link
               href="https://tellaho.com/?utm_source=wavewhisperer"
@@ -60,7 +60,7 @@ export function SurfReport({ id }: SurfReportProps) {
             </Link>
           </div>
         </div>
-        <div className="order-1 flex grow flex-col gap-4">
+        <div className="order-1 flex grow flex-col gap-4 border-2 border-indigo-600">
           <h1 className="max-w-96 text-6xl font-normal lg:max-w-xl lg:text-8xl">
             Peer into the crystal ball
           </h1>
