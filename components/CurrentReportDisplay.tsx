@@ -17,11 +17,7 @@ export function CurrentReportDisplay() {
   const { currentReport } = useCurrentReport();
   const { isPlaying, play, pause, audioRef, progress } = useAudio();
 
-  const date = currentReport
-    ? "lastBuildDate" in currentReport
-      ? currentReport.lastBuildDate
-      : currentReport.last_build_date
-    : null;
+  const date = currentReport?.lastBuildDate ?? null;
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
