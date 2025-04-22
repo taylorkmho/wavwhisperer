@@ -53,7 +53,7 @@ export function CurrentReportDisplay() {
   }
 
   return (
-    <div className="flex flex-row items-center gap-2">
+    <div className="flex flex-row items-center gap-2 border-2 border-violet-400">
       {audioRef !== null && (
         <motion.button
           className={cn(
