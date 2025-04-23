@@ -1,11 +1,6 @@
 import { cn } from "@/lib/utils";
 
-import {
-  Environment,
-  Lightformer,
-  MeshTransmissionMaterial,
-  Text,
-} from "@react-three/drei";
+import { Environment, MeshTransmissionMaterial, Text } from "@react-three/drei";
 import { Canvas, ThreeEvent, useFrame, useThree } from "@react-three/fiber";
 import {
   Suspense,
@@ -17,11 +12,14 @@ import {
 } from "react";
 import * as THREE from "three";
 import { useAudio } from "./AudioContext";
-import { AudioWaveform } from "./AudioWaveform";
 import { WavyGrid } from "./WavyGrid";
 
 const INITIAL_THICKNESS = 4;
 const FINAL_THICKNESS = 0.025;
+const DEFORM_STRENGTH = 0.0025; // Slightly increased for more wave motion
+const SMOOTH_FACTOR = 0.085; // Slightly smoother transitions
+const WAVE_SPEED = 0.005; // Increased for more wave movement
+const RIPPLE_SCALE = 3.2; // Larger waves
 
 interface SceneProps {
   poem?: string[];
@@ -30,7 +28,10 @@ interface SceneProps {
 const Scene: React.FC<SceneProps> = ({ poem }) => {
   const { size, scene } = useThree();
   const mesh = useRef<THREE.Mesh>(null);
+  const sphereRef = useRef<THREE.SphereGeometry>(null);
+  const originalPositions = useRef<Float32Array | null>(null);
   const [isRevealed, setIsRevealed] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const isPointerDown = useRef(false);
   const { camera } = useThree();
   const [pointerPosition, setPointerPosition] = useState<THREE.Vector2 | null>(
@@ -41,22 +42,65 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
   const currentBgColor = useRef<THREE.Color>(new THREE.Color("#000000"));
   const [targetThickness, setTargetThickness] = useState(INITIAL_THICKNESS);
   const isMobile = useMemo(() => size.width < 768, [size.width]);
+  const materialRef =
+    useRef<JSX.IntrinsicElements["meshTransmissionMaterial"]>(null);
 
-  const { play, pause, isPlaying } = useAudio();
+  const { play, pause, isPlaying, analyserNode } = useAudio();
+  const dataArrayRef = useRef<Uint8Array | null>(null);
+
+  // Initialize geometry and audio on mount
+  useEffect(() => {
+    if (sphereRef.current && !originalPositions.current) {
+      originalPositions.current = new Float32Array(
+        sphereRef.current.attributes.position.array
+      );
+    }
+    if (analyserNode) {
+      analyserNode.fftSize = 64;
+      analyserNode.smoothingTimeConstant = 0.6;
+    }
+    setIsInitialized(true);
+  }, [analyserNode]);
+
+  // Set initial camera position and scene color
+  useEffect(() => {
+    camera.position.set(0, 0, 4);
+    scene.background = currentBgColor.current;
+  }, [camera, scene]);
 
   const handleReveal = useCallback(() => {
+    if (!isInitialized) return;
     play();
     setTargetThickness(FINAL_THICKNESS);
     targetBgColor.current = new THREE.Color("#2C1DFF");
     setIsRevealed(true);
-  }, [play]);
+  }, [play, isInitialized]);
 
   const handleUnreveal = useCallback(() => {
+    if (!isInitialized) return;
     pause();
     setTargetThickness(INITIAL_THICKNESS);
     targetBgColor.current = new THREE.Color("#000000");
     setIsRevealed(false);
-  }, [pause]);
+  }, [pause, isInitialized]);
+
+  // Initialize audio analyzer
+  useEffect(() => {
+    if (analyserNode && !dataArrayRef.current) {
+      analyserNode.fftSize = 64; // Smaller FFT size for broader frequency bands
+      analyserNode.smoothingTimeConstant = 0.6;
+      dataArrayRef.current = new Uint8Array(analyserNode.frequencyBinCount);
+    }
+  }, [analyserNode]);
+
+  // Store original vertex positions
+  useEffect(() => {
+    if (sphereRef.current && !originalPositions.current) {
+      originalPositions.current = new Float32Array(
+        sphereRef.current.attributes.position.array
+      );
+    }
+  }, []);
 
   // Add push resistance calculation
   const pushResistance = useMemo(() => {
@@ -84,37 +128,12 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
     );
   }, [size.width, size.height, isMobile]);
 
-  // Add useEffect to set camera position only once on mount
-  useEffect(() => {
-    camera.position.set(0, 0, 4);
-  }, [camera]);
-
   useFrame((state) => {
     if (!mesh.current) return;
 
-    // Smoothly transition background color
-    currentBgColor.current.lerp(targetBgColor.current, 0.05);
-    scene.background = currentBgColor.current;
-
-    // Add resistance effect
-    if (isPointerDown.current && pointerPosition) {
-      const pointer = state.pointer;
-
-      const targetOffset = new THREE.Vector3(
-        (pointer.x - pointerPosition.x) * pushResistance,
-        (pointer.y - pointerPosition.y) * pushResistance,
-        -pushResistance
-      );
-
-      resistanceOffset.current.lerp(targetOffset, 0.1);
-      mesh.current.position.copy(resistanceOffset.current);
-    } else {
-      resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
-      mesh.current.position.copy(resistanceOffset.current);
-    }
-
-    // Rotate the ball
+    // Handle rotation based on revealed state
     if (isRevealed) {
+      // Lerp to zero rotation when revealed
       mesh.current.rotation.y = THREE.MathUtils.lerp(
         mesh.current.rotation.y,
         THREE.MathUtils.degToRad(
@@ -140,9 +159,149 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
         0.1
       );
     } else {
+      // Continue constant rotation when not revealed
       mesh.current.rotation.x += 0.0025;
       mesh.current.rotation.y += 0.005;
       mesh.current.rotation.z -= 0.0025;
+    }
+
+    // Rest of the frame updates for deformation etc.
+    if (!sphereRef.current || !originalPositions.current) return;
+
+    // Smoothly transition background color
+    currentBgColor.current.lerp(targetBgColor.current, 0.05);
+    scene.background = currentBgColor.current;
+
+    // Audio-reactive deformation
+    if (isPlaying && analyserNode && dataArrayRef.current) {
+      analyserNode.getByteFrequencyData(dataArrayRef.current);
+      const data = dataArrayRef.current;
+      const positions = sphereRef.current.attributes.position
+        .array as Float32Array;
+      const originalPos = originalPositions.current;
+
+      // Calculate average amplitude for material effects
+      let totalAmplitude = 0;
+
+      // Deform the sphere based on audio data
+      for (let i = 0; i < positions.length; i += 3) {
+        const originalX = originalPos[i];
+        const originalY = originalPos[i + 1];
+        const originalZ = originalPos[i + 2];
+
+        // Calculate spherical coordinates for better wave patterns
+        const radius = Math.sqrt(
+          originalX * originalX + originalY * originalY + originalZ * originalZ
+        );
+        const theta = Math.atan2(originalY, originalX);
+        const phi = Math.acos(originalZ / radius);
+
+        // Create wave patterns based on audio
+        let waveValue = 0;
+        const numWaves = 4;
+
+        for (let w = 0; w < numWaves; w++) {
+          const freqIndex = Math.floor((w / numWaves) * data.length);
+          const amplitude = data[freqIndex] / 255.0;
+
+          // Enhanced wave pattern
+          const wave =
+            Math.sin(
+              theta * RIPPLE_SCALE +
+                phi * RIPPLE_SCALE +
+                Date.now() * WAVE_SPEED * (w + 1.2) // Slightly faster for higher frequencies
+            ) *
+            amplitude *
+            (1.15 + amplitude); // Increased wave amplitude
+
+          waveValue += wave * (1.15 - w / numWaves); // More emphasis on wave patterns
+        }
+
+        waveValue /= numWaves * 0.85; // Stronger wave effect
+        totalAmplitude += Math.abs(waveValue);
+
+        // Calculate wave-like deformation with more movement
+        const deformAmount =
+          waveValue * DEFORM_STRENGTH * (1 + Math.abs(waveValue));
+        const direction = new THREE.Vector3(
+          originalX,
+          originalY,
+          originalZ
+        ).normalize();
+
+        // Enhanced circular motion
+        const time = Date.now() * WAVE_SPEED;
+        const motionScale = 0.007 * (1 + Math.abs(waveValue));
+        const circularMotion = new THREE.Vector3(
+          Math.sin(theta + time * 1.2) * motionScale,
+          Math.cos(phi + time) * motionScale,
+          Math.sin(theta + phi + time * 0.8) * motionScale
+        );
+
+        // Apply smooth wave deformation
+        positions[i] = THREE.MathUtils.lerp(
+          positions[i],
+          originalX + direction.x * deformAmount + circularMotion.x,
+          SMOOTH_FACTOR
+        );
+        positions[i + 1] = THREE.MathUtils.lerp(
+          positions[i + 1],
+          originalY + direction.y * deformAmount + circularMotion.y,
+          SMOOTH_FACTOR
+        );
+        positions[i + 2] = THREE.MathUtils.lerp(
+          positions[i + 2],
+          originalZ + direction.z * deformAmount + circularMotion.z,
+          SMOOTH_FACTOR
+        );
+      }
+
+      // Update geometry
+      sphereRef.current.attributes.position.needsUpdate = true;
+
+      // Update material properties with balanced changes
+      if (materialRef.current) {
+        const avgAmplitude = totalAmplitude / (data.length * 3);
+        materialRef.current.thickness = THREE.MathUtils.lerp(
+          targetThickness,
+          targetThickness * (1 + avgAmplitude * 0.1), // Moderate variation
+          0.25 // Balanced response speed
+        );
+        materialRef.current.chromaticAberration = THREE.MathUtils.lerp(
+          0.5,
+          0.5 * (1 + avgAmplitude * 0.2), // Moderate variation
+          0.5 // Balanced response speed
+        );
+      }
+    } else {
+      // Reset to original shape when not playing
+      const positions = sphereRef.current.attributes.position
+        .array as Float32Array;
+      for (let i = 0; i < positions.length; i++) {
+        positions[i] = THREE.MathUtils.lerp(
+          positions[i],
+          originalPositions.current[i],
+          SMOOTH_FACTOR
+        );
+      }
+      sphereRef.current.attributes.position.needsUpdate = true;
+    }
+
+    // Add resistance effect
+    if (isPointerDown.current && pointerPosition) {
+      const pointer = state.pointer;
+
+      const targetOffset = new THREE.Vector3(
+        (pointer.x - pointerPosition.x) * pushResistance,
+        (pointer.y - pointerPosition.y) * pushResistance,
+        -pushResistance
+      );
+
+      resistanceOffset.current.lerp(targetOffset, 0.1);
+      mesh.current.position.copy(resistanceOffset.current);
+    } else {
+      resistanceOffset.current.lerp(new THREE.Vector3(0, 0, 0), 0.1);
+      mesh.current.position.copy(resistanceOffset.current);
     }
   });
 
@@ -166,6 +325,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
   }, []);
 
   const handlePointerDown = (e: ThreeEvent<PointerEvent>) => {
+    if (!isInitialized) return;
     isPointerDown.current = true;
     setPointerPosition(new THREE.Vector2(e.point.x, e.point.y));
 
@@ -195,8 +355,9 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           document.body.style.cursor = "auto";
         }}
       >
-        <sphereGeometry args={[1, 100, 100]} />
+        <sphereGeometry ref={sphereRef} args={[1, 100, 100]} />
         <MeshTransmissionMaterial
+          ref={materialRef}
           transmission={0.99}
           thickness={targetThickness}
           roughness={0.1}
@@ -205,21 +366,6 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           ior={1.4}
           backside={false}
         />
-        {[
-          { position: -0.25, scale: 0.5, form: "ring" },
-          { position: -0.5, scale: 0.75, form: "ring" },
-          { position: -0.125, scale: 0.25, form: "ring" },
-          { position: -0.0625, scale: 0.125, form: "circle" },
-        ].map((light, index) => (
-          <Lightformer
-            key={index}
-            position={[0, 0, light.position]}
-            scale={light.scale}
-            form={light.form}
-            color="#2C1DFF"
-            intensity={1}
-          />
-        ))}
         <Text
           position={[0, 0, 0]}
           font="https://fonts.gstatic.com/s/raleway/v14/1Ptrg8zYS_SKggPNwK4vaqI.woff"
@@ -231,7 +377,6 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           {poem?.join("\n")}
         </Text>
       </mesh>
-      <AudioWaveform />
     </Suspense>
   );
 };
