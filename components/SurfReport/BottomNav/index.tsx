@@ -23,7 +23,7 @@ export function BottomNav({ currentSurfReport }: BottomNavProps) {
   const { waveHeights } = currentSurfReport;
 
   return (
-    <nav className="pointer-events-auto flex h-full items-end">
+    <nav className="pointer-events-auto h-full items-end md:flex">
       {isDropdownOpen && (
         <motion.div
           className="flex flex-col items-center space-y-2"
