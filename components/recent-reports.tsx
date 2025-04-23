@@ -10,7 +10,7 @@ export function RecentReports() {
   const pathname = usePathname();
   const { data: reports, isLoading } = useQuery({
     queryKey: ["recent-reports"],
-    queryFn: () => SurfReportClientService.getRecentReports(20),
+    queryFn: () => SurfReportClientService.getRecentReports(14),
   });
 
   if (isLoading) {

@@ -37,6 +37,8 @@ export class SurfReportClientService {
       .select(
         "id, last_build_date, discussion, wave_heights, poem, model, audio_path"
       )
+      .not("audio_path", "is", null)
+      // if more than one from same last_build_date, return the most recent
       .order("created_at", { ascending: false })
       .limit(limit);
 
