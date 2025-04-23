@@ -41,6 +41,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
   const targetBgColor = useRef<THREE.Color>(new THREE.Color("#000000"));
   const currentBgColor = useRef<THREE.Color>(new THREE.Color("#000000"));
   const [targetThickness, setTargetThickness] = useState(INITIAL_THICKNESS);
+  const currentThickness = useRef(INITIAL_THICKNESS);
   const isMobile = useMemo(() => size.width < 768, [size.width]);
   const materialRef =
     useRef<JSX.IntrinsicElements["meshTransmissionMaterial"]>(null);
@@ -158,11 +159,31 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
         ),
         0.1
       );
+
+      // Smoothly transition thickness when revealed
+      if (materialRef.current) {
+        currentThickness.current = THREE.MathUtils.lerp(
+          currentThickness.current,
+          targetThickness,
+          0.1
+        );
+        materialRef.current.thickness = currentThickness.current;
+      }
     } else {
       // Continue constant rotation when not revealed
       mesh.current.rotation.x += 0.0025;
       mesh.current.rotation.y += 0.005;
       mesh.current.rotation.z -= 0.0025;
+
+      // Smoothly transition thickness when not revealed
+      if (materialRef.current) {
+        currentThickness.current = THREE.MathUtils.lerp(
+          currentThickness.current,
+          targetThickness,
+          0.1
+        );
+        materialRef.current.thickness = currentThickness.current;
+      }
     }
 
     // Rest of the frame updates for deformation etc.
@@ -262,10 +283,12 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
       // Update material properties with balanced changes
       if (materialRef.current) {
         const avgAmplitude = totalAmplitude / (data.length * 3);
+        const currentThickness =
+          materialRef.current.thickness ?? targetThickness;
         materialRef.current.thickness = THREE.MathUtils.lerp(
-          targetThickness,
+          currentThickness,
           targetThickness * (1 + avgAmplitude * 0.1), // Moderate variation
-          0.25 // Balanced response speed
+          0.1 // Slower lerp for smoother transition
         );
         materialRef.current.chromaticAberration = THREE.MathUtils.lerp(
           0.5,
@@ -285,6 +308,17 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
         );
       }
       sphereRef.current.attributes.position.needsUpdate = true;
+
+      // Lerp thickness back to initial value when not playing
+      if (materialRef.current) {
+        const currentThickness =
+          materialRef.current.thickness ?? targetThickness;
+        materialRef.current.thickness = THREE.MathUtils.lerp(
+          currentThickness,
+          targetThickness,
+          0.1 // Same lerp speed for consistency
+        );
+      }
     }
 
     // Add resistance effect
