@@ -1,12 +1,9 @@
-import { SurfReportRecord } from "@/types/database";
 import { SurfReport } from "@/types/noaa";
 import { createContext, ReactNode, useContext, useState } from "react";
 
-type CurrentReport = SurfReport | SurfReportRecord;
-
 interface CurrentReportContextType {
-  currentReport: CurrentReport | null;
-  setCurrentReport: (report: CurrentReport | null) => void;
+  currentReport: SurfReport | null;
+  setCurrentReport: (report: SurfReport | null) => void;
 }
 
 const CurrentReportContext = createContext<
@@ -14,9 +11,7 @@ const CurrentReportContext = createContext<
 >(undefined);
 
 export function CurrentReportProvider({ children }: { children: ReactNode }) {
-  const [currentReport, setCurrentReport] = useState<CurrentReport | null>(
-    null
-  );
+  const [currentReport, setCurrentReport] = useState<SurfReport | null>(null);
 
   return (
     <CurrentReportContext.Provider value={{ currentReport, setCurrentReport }}>

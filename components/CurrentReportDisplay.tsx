@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import { useEffect, useMemo } from "react";
+import { ButtonVibes } from "./ButtonVibes";
 import { RecentReports } from "./recent-reports";
 import { useAudio } from "./SurfReport/AudioContext";
 import { useCurrentReport } from "./SurfReport/CurrentReportContext";
@@ -15,13 +15,9 @@ import {
 
 export function CurrentReportDisplay() {
   const { currentReport } = useCurrentReport();
-  const { isPlaying, play, pause, audioRef, progress } = useAudio();
+  const { isPlaying, play, pause } = useAudio();
 
-  const date = currentReport
-    ? "lastBuildDate" in currentReport
-      ? currentReport.lastBuildDate
-      : currentReport.last_build_date
-    : null;
+  const date = currentReport?.lastBuildDate ?? null;
 
   useEffect(() => {
     const handleKeyPress = (event: KeyboardEvent) => {
@@ -53,47 +49,11 @@ export function CurrentReportDisplay() {
   }
 
   return (
-    <div className="flex flex-row items-center gap-2">
-      {audioRef !== null && (
-        <motion.button
-          className={cn(
-            "group pointer-events-auto inline-flex h-8 w-24 items-center justify-center px-2 font-pixel text-3xl"
-          )}
-          initial={{ opacity: 0, scale: 1.2, filter: "blur(2px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{
-            type: "spring",
-            duration: 0.8,
-            damping: 10,
-            delay: 0.2,
-          }}
-          onClick={() => (isPlaying ? pause() : play())}
-        >
-          <span
-            className={cn(
-              "bg-brand w-full rounded-sm transition-transform hover:scale-[103%] active:scale-[95%]",
-              isPlaying &&
-                "text-brand scale-95 bg-white hover:scale-95 active:scale-[90%]"
-            )}
-          >
-            {isPlaying ? "PAUSE" : "PLAY"}
-          </span>
-        </motion.button>
-      )}
+    <div className="flex flex-row items-center gap-2 border-0 border-violet-400">
       <Sheet>
         <SheetTrigger asChild>
-          <motion.button
-            className="pointer-events-auto relative text-sm text-foreground"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              type: "spring",
-              duration: 0.8,
-              damping: 6,
-              delay: 0.4,
-            }}
-          >
-            <div className="flex items-center justify-center gap-3 rounded bg-background px-4 font-pixel text-3xl font-normal">
+          <ButtonVibes className="pointer-events-auto relative text-sm text-foreground">
+            <div className="flex items-center justify-center gap-3 rounded-lg bg-background px-4 font-pixel text-3xl font-normal">
               {isToday && (
                 <span className="text-brand text-[0.7em]">TODAY</span>
               )}
@@ -102,14 +62,6 @@ export function CurrentReportDisplay() {
                 day: "numeric",
                 year: "numeric",
               })}
-              <div
-                className={cn(
-                  "absolute inset-x-0 -bottom-2 h-0.5 w-full bg-white"
-                )}
-                style={{
-                  transform: `scaleX(${progress})`,
-                }}
-              />
             </div>
             <div
               className={cn(
@@ -119,7 +71,7 @@ export function CurrentReportDisplay() {
                   "from-fuchsia-500/0 via-fuchsia-500 to-fuchsia-500/0"
               )}
             />
-          </motion.button>
+          </ButtonVibes>
         </SheetTrigger>
         <SheetContent side="left" className="h-full overflow-y-auto p-0">
           <SheetHeader className="p-2">
