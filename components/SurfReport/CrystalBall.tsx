@@ -17,6 +17,7 @@ import {
 } from "react";
 import * as THREE from "three";
 import { useAudio } from "./AudioContext";
+import { AudioWaveform } from "./AudioWaveform";
 import { WavyGrid } from "./WavyGrid";
 
 const INITIAL_THICKNESS = 4;
@@ -230,6 +231,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           {poem?.join("\n")}
         </Text>
       </mesh>
+      <AudioWaveform />
     </Suspense>
   );
 };

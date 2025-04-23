@@ -13,9 +13,11 @@ interface AudioContextType {
   setAudioPath: (audioPath: string | null) => void;
   error: string | null;
   isLoading: boolean;
+  webAudioContext: AudioContext | null;
+  analyserNode: AnalyserNode | null;
 }
 
-const AudioContext = createContext<AudioContextType | undefined>(undefined);
+const AudioContextObj = createContext<AudioContextType | undefined>(undefined);
 
 export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
@@ -26,6 +28,9 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [progress, setProgress] = useState<number>(0);
+  const webAudioContextRef = useRef<AudioContext | null>(null);
+  const analyserNodeRef = useRef<AnalyserNode | null>(null);
+  const sourceNodeRef = useRef<MediaElementAudioSourceNode | null>(null);
   const plausible = usePlausible();
   const { currentReport } = useCurrentReport();
 
@@ -34,17 +39,51 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
     return "id" in currentReport ? currentReport.id : null;
   };
 
-  const play = () => {
+  const setupAudioContext = async () => {
+    if (!audioRef.current || sourceNodeRef.current) return;
+
+    try {
+      // Create AudioContext on first user interaction
+      if (!webAudioContextRef.current) {
+        webAudioContextRef.current = new AudioContext();
+      }
+
+      // Resume the audio context if it's suspended
+      if (webAudioContextRef.current.state === "suspended") {
+        await webAudioContextRef.current.resume();
+      }
+
+      // Create and connect nodes
+      analyserNodeRef.current = webAudioContextRef.current.createAnalyser();
+      analyserNodeRef.current.fftSize = 128;
+      analyserNodeRef.current.smoothingTimeConstant = 0.7;
+
+      sourceNodeRef.current =
+        webAudioContextRef.current.createMediaElementSource(audioRef.current);
+
+      sourceNodeRef.current.connect(analyserNodeRef.current);
+      analyserNodeRef.current.connect(webAudioContextRef.current.destination);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to setup audio");
+    }
+  };
+
+  const play = async () => {
     if (audioRef.current && !isPlaying) {
-      audioRef.current.play().catch((err) => {
-        setError(err.message);
+      try {
+        await setupAudioContext();
+        await audioRef.current.play();
+        setIsPlaying(true);
+        plausible("audio_play", { props: { reportId: getReportId() } });
+      } catch (err) {
+        const error =
+          err instanceof Error ? err : new Error("Failed to play audio");
+        setError(error.message);
         setIsPlaying(false);
         plausible("audio_error", {
-          props: { error: err.message, reportId: getReportId() },
+          props: { error: error.message, reportId: getReportId() },
         });
-      });
-      setIsPlaying(true);
-      plausible("audio_play", { props: { reportId: getReportId() } });
+      }
     }
   };
 
@@ -109,7 +148,7 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   };
 
   return (
-    <AudioContext.Provider
+    <AudioContextObj.Provider
       value={{
         isPlaying,
         play,
@@ -121,11 +160,14 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         setAudioPath,
         error,
         isLoading,
+        webAudioContext: webAudioContextRef.current,
+        analyserNode: analyserNodeRef.current,
       }}
     >
       <audio
         ref={audioRef}
         className="invisible"
+        crossOrigin="anonymous"
         src={
           audioPath
             ? `https://mnegthmftttdlazyjbke.supabase.co/storage/v1/object/public/voiceover/${audioPath}`
@@ -139,12 +181,12 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         onLoadedData={handleAudioLoaded}
       />
       {children}
-    </AudioContext.Provider>
+    </AudioContextObj.Provider>
   );
 };
 
 export const useAudio = () => {
-  const context = useContext(AudioContext);
+  const context = useContext(AudioContextObj);
   if (!context) {
     throw new Error("useAudio must be used within an AudioProvider");
   }
