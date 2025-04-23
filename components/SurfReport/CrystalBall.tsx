@@ -41,6 +41,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
   const targetBgColor = useRef<THREE.Color>(new THREE.Color("#000000"));
   const currentBgColor = useRef<THREE.Color>(new THREE.Color("#000000"));
   const [targetThickness, setTargetThickness] = useState(INITIAL_THICKNESS);
+  const currentThickness = useRef(INITIAL_THICKNESS);
   const isMobile = useMemo(() => size.width < 768, [size.width]);
   const materialRef =
     useRef<JSX.IntrinsicElements["meshTransmissionMaterial"]>(null);
@@ -262,16 +263,13 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
       // Update material properties with balanced changes
       if (materialRef.current) {
         const avgAmplitude = totalAmplitude / (data.length * 3);
-        materialRef.current.thickness = THREE.MathUtils.lerp(
-          targetThickness,
-          targetThickness * (1 + avgAmplitude * 0.1), // Moderate variation
-          0.25 // Balanced response speed
+        const audioThickness = targetThickness * (1 + avgAmplitude * 0.025);
+        currentThickness.current = THREE.MathUtils.lerp(
+          currentThickness.current,
+          audioThickness,
+          0.1
         );
-        materialRef.current.chromaticAberration = THREE.MathUtils.lerp(
-          0.5,
-          0.5 * (1 + avgAmplitude * 0.2), // Moderate variation
-          0.5 // Balanced response speed
-        );
+        materialRef.current.thickness = currentThickness.current;
       }
     } else {
       // Reset to original shape when not playing
@@ -285,6 +283,16 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
         );
       }
       sphereRef.current.attributes.position.needsUpdate = true;
+
+      // Smoothly transition thickness when not playing
+      if (materialRef.current) {
+        currentThickness.current = THREE.MathUtils.lerp(
+          currentThickness.current,
+          targetThickness,
+          0.1
+        );
+        materialRef.current.thickness = currentThickness.current;
+      }
     }
 
     // Add resistance effect
@@ -362,7 +370,7 @@ const Scene: React.FC<SceneProps> = ({ poem }) => {
           thickness={targetThickness}
           roughness={0.1}
           metalness={0}
-          chromaticAberration={0.5}
+          chromaticAberration={isRevealed ? 0.25 : 0.5}
           ior={1.4}
           backside={false}
         />
