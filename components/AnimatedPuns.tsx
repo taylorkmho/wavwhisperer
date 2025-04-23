@@ -35,9 +35,18 @@ export default function AnimatedPuns() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [height, setHeight] = useState(0);
 
-  useLayoutEffect(() => {
+  const updateHeight = () => {
     if (!measureRef.current) return;
     setHeight(measureRef.current.offsetHeight);
+  };
+
+  useLayoutEffect(() => {
+    updateHeight();
+  }, []);
+
+  useEffect(() => {
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
   }, []);
 
   useEffect(() => {
@@ -52,7 +61,7 @@ export default function AnimatedPuns() {
       style={{
         height,
       }}
-      className="relative w-72 overflow-hidden text-sm uppercase tracking-widest"
+      className="relative w-72 overflow-hidden text-xs uppercase tracking-widest md:text-sm"
     >
       <span
         ref={measureRef}
