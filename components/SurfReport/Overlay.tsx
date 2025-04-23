@@ -1,17 +1,17 @@
 import AnimatedPuns from "@/components/AnimatedPuns";
 import { CurrentReportDisplay } from "@/components/CurrentReportDisplay";
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import Link from "next/link";
+import { ButtonVibes } from "../ButtonVibes";
 import { useAudio } from "./AudioContext";
 import { BottomNav } from "./BottomNav";
 import { useCurrentReport } from "./CurrentReportContext";
 
 export function Overlay() {
   const { currentReport } = useCurrentReport();
-  const { isPlaying, play, pause, audioRef } = useAudio();
+  const { isPlaying, play, pause, audioRef, progress } = useAudio();
   return (
-    <div className="pointer-events-none absolute inset-0 z-10 flex w-full flex-col gap-4 border-2 border-red-400 px-4 md:flex-row">
+    <div className="pointer-events-none absolute inset-0 z-10 flex w-full flex-col gap-4 border-0 border-red-400 p-4 md:flex-row">
       <div className="order-2 flex justify-between gap-2 lg:flex-row">
         <div className="flex flex-row-reverse items-start gap-2 px-2 md:flex-row md:px-0 md:text-right">
           <AnimatedPuns />
@@ -24,39 +24,43 @@ export function Overlay() {
           </Link>
         </div>
       </div>
-      <div className="order-2 flex grow flex-col gap-4 border-2 border-blue-400 md:order-1">
-        <h1 className="max-w-96 text-6xl font-normal lg:max-w-xl lg:text-8xl">
+      <div className="order-2 flex grow flex-col gap-4 border-0 border-blue-400 md:order-1">
+        <h1 className="max-w-96 text-4xl font-normal md:text-6xl lg:max-w-xl lg:text-8xl">
           Peer into the crystal ball
         </h1>
         <CurrentReportDisplay />
-        {audioRef !== null && (
-          <motion.button
-            className={cn(
-              "group pointer-events-auto inline-flex h-8 w-24 items-center justify-center px-2 font-pixel text-3xl"
-            )}
-            initial={{ opacity: 0, scale: 1.2, filter: "blur(2px)" }}
-            animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-            transition={{
-              type: "spring",
-              duration: 0.8,
-              damping: 10,
-              delay: 0.2,
-            }}
-            onClick={() => (isPlaying ? pause() : play())}
-          >
-            <span
+      </div>
+
+      {currentReport && (
+        <div className="absolute inset-x-4 bottom-4 order-3 flex flex-row items-end gap-4 border-0 border-fuchsia-400">
+          {audioRef !== null && (
+            <ButtonVibes
               className={cn(
-                "bg-brand w-full rounded-sm transition-transform hover:scale-[103%] active:scale-[95%]",
-                isPlaying &&
-                  "text-brand scale-95 bg-white hover:scale-95 active:scale-[90%]"
+                "group pointer-events-auto inline-flex shrink-0 items-center justify-center place-self-center rounded-lg font-pixel",
+                "relative h-10 w-20 text-4xl",
+                "md:w-24",
+                "bg-brand",
+                isPlaying && "text-brand bg-white"
               )}
+              isActive={isPlaying}
+              onClick={() => (isPlaying ? pause() : play())}
             >
               {isPlaying ? "PAUSE" : "PLAY"}
-            </span>
-          </motion.button>
-        )}
-      </div>
-      {currentReport && <BottomNav currentSurfReport={currentReport} />}
+              <div
+                className={cn(
+                  "absolute inset-x-0 -bottom-2 h-0.5 w-full bg-white"
+                )}
+                style={{
+                  transform: `scaleX(${progress})`,
+                }}
+              />
+            </ButtonVibes>
+          )}
+          <div className="h-10 min-w-0 grow">
+            <BottomNav currentSurfReport={currentReport} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

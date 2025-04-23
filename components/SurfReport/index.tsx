@@ -40,7 +40,7 @@ export function SurfReport({ id }: SurfReportProps) {
   }
 
   return (
-    <section className="relative h-screen w-screen overflow-hidden border-2 border-green-400">
+    <section className="relative h-screen w-screen overflow-hidden border-0 border-green-400">
       <CrystalBall poem={data.poem} />
       <Overlay />
     </section>

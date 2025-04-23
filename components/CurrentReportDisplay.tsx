@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
-import { motion } from "framer-motion";
 import { useEffect, useMemo } from "react";
+import { ButtonVibes } from "./ButtonVibes";
 import { RecentReports } from "./recent-reports";
 import { useAudio } from "./SurfReport/AudioContext";
 import { useCurrentReport } from "./SurfReport/CurrentReportContext";
@@ -15,7 +15,7 @@ import {
 
 export function CurrentReportDisplay() {
   const { currentReport } = useCurrentReport();
-  const { isPlaying, play, pause, audioRef, progress } = useAudio();
+  const { isPlaying, play, pause } = useAudio();
 
   const date = currentReport?.lastBuildDate ?? null;
 
@@ -49,20 +49,10 @@ export function CurrentReportDisplay() {
   }
 
   return (
-    <div className="flex flex-row items-center gap-2 border-2 border-violet-400">
+    <div className="flex flex-row items-center gap-2 border-0 border-violet-400">
       <Sheet>
         <SheetTrigger asChild>
-          <motion.button
-            className="pointer-events-auto relative text-sm text-foreground"
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{
-              type: "spring",
-              duration: 0.8,
-              damping: 6,
-              delay: 0.4,
-            }}
-          >
+          <ButtonVibes className="pointer-events-auto relative text-sm text-foreground">
             <div className="flex items-center justify-center gap-3 rounded bg-background px-4 font-pixel text-3xl font-normal">
               {isToday && (
                 <span className="text-brand text-[0.7em]">TODAY</span>
@@ -72,14 +62,6 @@ export function CurrentReportDisplay() {
                 day: "numeric",
                 year: "numeric",
               })}
-              <div
-                className={cn(
-                  "absolute inset-x-0 -bottom-2 h-0.5 w-full bg-white"
-                )}
-                style={{
-                  transform: `scaleX(${progress})`,
-                }}
-              />
             </div>
             <div
               className={cn(
@@ -89,7 +71,7 @@ export function CurrentReportDisplay() {
                   "from-fuchsia-500/0 via-fuchsia-500 to-fuchsia-500/0"
               )}
             />
-          </motion.button>
+          </ButtonVibes>
         </SheetTrigger>
         <SheetContent side="left" className="h-full overflow-y-auto p-0">
           <SheetHeader className="p-2">

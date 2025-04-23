@@ -23,11 +23,11 @@ export function BottomNav({ currentSurfReport }: BottomNavProps) {
   const { waveHeights } = currentSurfReport;
 
   return (
-    <nav>
+    <nav className="pointer-events-auto h-full">
       <AnimatePresence>
         {isDropdownOpen && (
           <motion.div
-            className="absolute inset-x-0 bottom-4 flex flex-col items-center space-y-2 px-4"
+            className="flex flex-col items-center space-y-2"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
@@ -40,7 +40,7 @@ export function BottomNav({ currentSurfReport }: BottomNavProps) {
                 ))}
               </div>
             </div>
-            <div className="inline-flex items-center gap-2 overflow-hidden rounded-full bg-secondary text-xs">
+            <div className="inline-flex items-center gap-2 overflow-hidden rounded-lg bg-secondary text-xs">
               <div className="flex grow items-center gap-2 py-1 pl-1">
                 <Image
                   src="/noaa_digital_logo.svg"
@@ -72,19 +72,19 @@ export function BottomNav({ currentSurfReport }: BottomNavProps) {
         )}
         {!isDropdownOpen && (
           <motion.div
-            className="absolute inset-x-0 bottom-4 flex justify-center px-4"
+            className="flex h-full justify-center"
             initial={{ opacity: 0, y: 100 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 100 }}
             key="bottom-nav"
           >
-            <div className="relative flex min-w-0 items-center overflow-clip rounded-full bg-secondary">
-              <div className="relative inline-flex grow overflow-x-auto">
-                <div className="flex shrink-0 items-center gap-2 py-2 pl-4 pr-2">
+            <div className="relative flex h-full min-w-0 items-center overflow-clip rounded-lg bg-secondary">
+              <div className="relative inline-flex h-full grow overflow-x-auto">
+                <div className="flex h-full shrink-0 items-center gap-2 py-2 pl-4 pr-2">
                   <WaveHeights waveHeights={waveHeights} />
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex h-full items-center gap-2">
                 <Link
                   href="https://github.com/taylorkmho/wavwhisperer"
                   target="_blank"
