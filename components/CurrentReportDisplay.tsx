@@ -53,7 +53,7 @@ export function CurrentReportDisplay() {
       <Sheet>
         <SheetTrigger asChild>
           <ButtonVibes className="pointer-events-auto relative text-sm text-foreground">
-            <div className="flex items-center justify-center gap-3 rounded bg-background px-4 font-pixel text-3xl font-normal">
+            <div className="flex items-center justify-center gap-3 rounded-lg bg-background px-4 font-pixel text-3xl font-normal">
               {isToday && (
                 <span className="text-brand text-[0.7em]">TODAY</span>
               )}

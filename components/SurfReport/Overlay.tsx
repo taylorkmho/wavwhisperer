@@ -26,7 +26,8 @@ export function Overlay() {
       </div>
       <div className="order-2 flex grow flex-col gap-4 border-0 border-blue-400 md:order-1">
         <h1 className="max-w-96 text-4xl font-normal md:text-6xl lg:max-w-xl lg:text-8xl">
-          Peer into the crystal ball
+          Peer into the
+          <br /> crystal ball
         </h1>
         <CurrentReportDisplay />
       </div>
