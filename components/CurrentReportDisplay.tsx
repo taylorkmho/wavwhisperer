@@ -50,32 +50,6 @@ export function CurrentReportDisplay() {
 
   return (
     <div className="flex flex-row items-center gap-2 border-2 border-violet-400">
-      {audioRef !== null && (
-        <motion.button
-          className={cn(
-            "group pointer-events-auto inline-flex h-8 w-24 items-center justify-center px-2 font-pixel text-3xl"
-          )}
-          initial={{ opacity: 0, scale: 1.2, filter: "blur(2px)" }}
-          animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-          transition={{
-            type: "spring",
-            duration: 0.8,
-            damping: 10,
-            delay: 0.2,
-          }}
-          onClick={() => (isPlaying ? pause() : play())}
-        >
-          <span
-            className={cn(
-              "bg-brand w-full rounded-sm transition-transform hover:scale-[103%] active:scale-[95%]",
-              isPlaying &&
-                "text-brand scale-95 bg-white hover:scale-95 active:scale-[90%]"
-            )}
-          >
-            {isPlaying ? "PAUSE" : "PLAY"}
-          </span>
-        </motion.button>
-      )}
       <Sheet>
         <SheetTrigger asChild>
           <motion.button

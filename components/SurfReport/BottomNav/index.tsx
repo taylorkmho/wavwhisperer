@@ -10,11 +10,16 @@ import { IoClose } from "react-icons/io5";
 import { WaveHeights } from "./WaveHeights";
 
 interface BottomNavProps {
-  currentSurfReport: SurfReport;
+  currentSurfReport?: SurfReport;
 }
 
 export function BottomNav({ currentSurfReport }: BottomNavProps) {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  if (!currentSurfReport) {
+    return null;
+  }
+
   const { waveHeights } = currentSurfReport;
 
   return (
