@@ -55,7 +55,7 @@ Then small on the south, come what may!`,
 
   return withAnthropicErrorHandler(async () => {
     const response = await anthropic.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-haiku-4-5-20251001",
       max_tokens: 1024,
       temperature: 1,
       system: `${persona}\n${instruction}\n${context}\n${format}\n${audience}\n${tone}`,
