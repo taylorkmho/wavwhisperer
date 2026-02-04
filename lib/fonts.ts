@@ -15,6 +15,7 @@ export const fontPixel = FontPixel({
   variable: "--font-pixel",
   weight: ["400"],
   style: "normal",
+  adjustFontFallback: false, // Suppress font override values warning for Micro 5
 });
 
 export const fontSerif = FontSerif({
