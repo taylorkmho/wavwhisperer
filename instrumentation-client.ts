@@ -30,3 +30,6 @@ Sentry.init({
 
   environment: process.env.NODE_ENV,
 });
+
+// Export router transition hook for Sentry navigation instrumentation
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

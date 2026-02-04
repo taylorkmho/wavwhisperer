@@ -7,6 +7,9 @@ import * as Sentry from "@sentry/nextjs";
 import { SurfReportServerService } from "@/lib/services/surf-report.server";
 import { NextResponse } from "next/server";
 
+// Force dynamic rendering since this route uses request headers
+export const dynamic = "force-dynamic";
+
 export async function GET(request: Request) {
   try {
     // Verify cron secret if needed
@@ -24,7 +27,7 @@ export async function GET(request: Request) {
     // Fetch new data
     console.log("[CRON] Step 1: Fetching from NOAA...");
     let xmlText: string;
-    let parsedReport: ReturnType<typeof parseNoaaReport>;
+    let parsedReport: ReturnType<typeof parseNoaaReport> | undefined;
     try {
       xmlText = await fetchNoaaReport();
       parsedReport = parseNoaaReport(xmlText);
@@ -36,6 +39,15 @@ export async function GET(request: Request) {
       Sentry.captureException(error, {
         tags: { step: "fetch_noaa_report", cron_job: true },
         extra: { last_build_date: parsedReport?.lastBuildDate },
+      });
+      throw error;
+    }
+
+    // Ensure parsedReport is defined before proceeding
+    if (!parsedReport) {
+      const error = new Error("Failed to parse NOAA report");
+      Sentry.captureException(error, {
+        tags: { step: "fetch_noaa_report", cron_job: true },
       });
       throw error;
     }
