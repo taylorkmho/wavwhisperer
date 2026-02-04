@@ -1,4 +1,5 @@
 import { usePlausible } from "next-plausible";
+import * as Sentry from "@sentry/nextjs";
 import React, { createContext, useContext, useRef, useState } from "react";
 import { useCurrentReport } from "./CurrentReportContext";
 
@@ -83,6 +84,10 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
         plausible("audio_error", {
           props: { error: error.message, reportId: getReportId() },
         });
+        Sentry.captureException(err, {
+          tags: { component: "AudioContext", action: "play" },
+          extra: { report_id: getReportId(), audio_path: audioPath },
+        });
       }
     }
   };
@@ -112,11 +117,23 @@ export const AudioProvider: React.FC<{ children: React.ReactNode }> = ({
   ) => {
     const audioElement = e.target as HTMLAudioElement;
     const errorMessage = audioElement.error?.message || "Failed to load audio";
+    const error = audioElement.error
+      ? new Error(`Audio error: ${errorMessage} (code: ${audioElement.error.code})`)
+      : new Error(errorMessage);
     setError(errorMessage);
     setIsPlaying(false);
     setIsLoading(false);
     plausible("audio_error", {
       props: { error: errorMessage, reportId: getReportId() },
+    });
+    Sentry.captureException(error, {
+      tags: { component: "AudioContext", action: "load" },
+      extra: {
+        report_id: getReportId(),
+        audio_path: audioPath,
+        error_code: audioElement.error?.code,
+        error_message: errorMessage,
+      },
     });
   };
 

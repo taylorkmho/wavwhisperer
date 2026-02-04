@@ -65,6 +65,11 @@ Create a `.env` file in the root directory of the project. This file will store 
 - `ANTHROPIC_API_KEY`: API key for Anthropic's Claude to generate limericks.
 - `SUPABASE_SERVICE_ROLE_KEY`: Service role key for Supabase, used for server-side operations requiring elevated permissions.
 - `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`: Public credentials for accessing Supabase, used for client-side operations.
+- `NEXT_PUBLIC_SENTRY_DSN`: Public DSN for Sentry error tracking (client-side).
+- `SENTRY_DSN`: Server-side DSN for Sentry error tracking (optional, falls back to `NEXT_PUBLIC_SENTRY_DSN`).
+- `SENTRY_ORG`: Sentry organization slug (optional, for source map uploads).
+- `SENTRY_PROJECT`: Sentry project slug (optional, for source map uploads).
+- `SENTRY_AUTH_TOKEN`: Sentry auth token (optional, for source map uploads).
 
 ### 4. Set Up Database
 
